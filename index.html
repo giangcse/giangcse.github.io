@@ -274,8 +274,42 @@
         </div>
     </div>
     <!-- Event End -->
-
-
+    <!-- RSVP Start -->
+    <div class="container-fluid py-5" id="join">
+        <div class="container py-5">
+            <div class="section-title position-relative text-center">
+                <h6 class="text-uppercase text-primary mb-3" style="letter-spacing: 3px;">Xác nhận tham dự</h6>
+                <h1 class="font-secondary display-4">Join Our Party</h1>
+                <i class="far fa-heart text-dark"></i>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="text-center">
+                        <form>
+                            <div id="confirmJoin" style="display: block;">
+                                <button class="btn btn-secondary font-weight-bold py-3 px-5" type="button" onclick="cannotGo();">Không thể tham dự được</button>
+                                <button class="btn btn-primary font-weight-bold py-3 px-5" type="submit">Tham dự</button>
+                            </div>
+                            <div id="qrpay" style="display: none;">
+                                <h5 class="font-weight-normal text-muted mb-3 pb-3">Thật lấy làm tiếc khi không thể tham dự buổi đám cưới của Thanh Giảng & Bích Ngân. Dưới đây có một số thông tin có thể cần thiết.</h5>
+                                <img src="statics/img/vnpay_qr.jpg" alt="QR Chuyển khoản" srcset="" class="col-lg-5">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- RSVP End -->
+    <!-- Script for cannot go -->
+    <script>
+        function cannotGo(params) {
+            let confirmButtonGroup = document.getElementById("confirmJoin");
+            let showMore = document.getElementById("qrpay")
+            confirmButtonGroup.style.display = "none";
+            showMore.style.display = "block";
+        }
+    </script>
     <!-- Friends & Family Start -->
     <div class="container-fluid py-5" id="maps">
         <div class="container pt-5 pb-3">
@@ -293,36 +327,6 @@
         </div>
     </div>
     <!-- Friends & Family End -->
-
-
-    <!-- RSVP Start -->
-    <div class="container-fluid py-5" id="join">
-        <div class="container py-5">
-            <div class="section-title position-relative text-center">
-                <h6 class="text-uppercase text-primary mb-3" style="letter-spacing: 3px;">Xác nhận tham dự</h6>
-                <h1 class="font-secondary display-4">Join Our Party</h1>
-                <i class="far fa-heart text-dark"></i>
-            </div>
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="text-center">
-                        <form>
-                            <div class="form-row">
-                                <div class="form-group col-sm-12">
-                                    <input type="text" class="form-control bg-secondary border-0 py-4 px-3" placeholder="Vui lòng điền tên" id="message"/>
-                                </div>
-                            </div>
-                            <div>
-                                <button class="btn btn-primary font-weight-bold py-3 px-5" type="submit">Submit</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- RSVP End -->
-
 
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-white py-5" id="contact" style="margin-top: 90px;">
