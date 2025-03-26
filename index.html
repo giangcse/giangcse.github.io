@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Food Chooser</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .food-list {
+            margin: 20px 0;
+        }
+        .food-item {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .food-item:hover {
+            background-color: #e0e0e0;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 5px;
+            display: none;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #0088cc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Chọn món ăn hôm nay</h2>
+        <div class="food-list" id="foodList"></div>
+        <button onclick="randomFood()">Chọn ngẫu nhiên</button>
+        <div id="result"></div>
+    </div>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        // Danh sách món ăn
+        const foods = [
+            "Phở bò",
+            "Bún chả",
+            "Cơm tấm",
+            "Bánh mì",
+            "Mì Quảng",
+            "Hủ tiếu",
+            "Bánh xèo",
+            "Gỏi cuốn"
+        ];
+
+        // Hiển thị danh sách món ăn
+        function displayFoods() {
+            const foodList = document.getElementById('foodList');
+            foods.forEach(food => {
+                const div = document.createElement('div');
+                div.className = 'food-item';
+                div.textContent = food;
+                div.onclick = () => selectFood(food);
+                foodList.appendChild(div);
+            });
+        }
+
+        // Chọn món ăn thủ công
+        function selectFood(food) {
+            const result = document.getElementById('result');
+            result.style.display = 'block';
+            result.textContent = `Bạn đã chọn: ${food}`;
+            Telegram.WebApp.MainButton.setText('XÁC NHẬN ĐẶT MÓN');
+            Telegram.WebApp.MainButton.show();
+        }
+
+        // Chọn ngẫu nhiên món ăn
+        function randomFood() {
+            const randomIndex = Math.floor(Math.random() * foods.length);
+            const selectedFood = foods[randomIndex];
+            const result = document.getElementById('result');
+            result.style.display = 'block';
+            result.textContent = `Gợi ý hôm nay: ${selectedFood}`;
+            Telegram.WebApp.MainButton.setText('XÁC NHẬN ĐẶT MÓN');
+            Telegram.WebApp.MainButton.show();
+        }
+
+        // Xử lý khi nhấn nút MainButton
+        Telegram.WebApp.onEvent('mainButtonClicked', function() {
+            const result = document.getElementById('result').textContent;
+            Telegram.WebApp.sendData(result);
+        });
+
+        // Khởi tạo Telegram Web App
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
+
+        // Hiển thị danh sách khi load
+        window.onload = displayFoods;
+    </script>
+</body>
+</html>
