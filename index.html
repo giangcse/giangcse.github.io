@@ -53,27 +53,20 @@
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        // Danh sách quán ăn mẫu (thay bằng API thực tế trong triển khai)
-        const restaurants = [
-            { name: "Phở 24", lat: 10.7769, lon: 106.7009, menu: "Phở bò, phở gà", distance: 0 },
-            { name: "Bánh Mì Huỳnh Hoa", lat: 10.7700, lon: 106.6980, menu: "Bánh mì pate", distance: 0 },
-            { name: "Cơm Tấm Ba Ghiền", lat: 10.7800, lon: 106.7020, menu: "Cơm tấm sườn", distance: 0 }
-        ];
-
         let userLocation = null;
 
         // Lấy vị trí người dùng
         function getLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
-                    (position) => {
+                    async (position) => {
                         userLocation = {
                             lat: position.coords.latitude,
                             lon: position.coords.longitude
                         };
                         document.getElementById('locationStatus').textContent = 
                             `Vị trí: ${userLocation.lat.toFixed(4)}, ${userLocation.lon.toFixed(4)}`;
-                        findNearbyRestaurants();
+                        await fetchAndDisplayRestaurants();
                     },
                     (error) => {
                         document.getElementById('locationStatus').textContent = 
@@ -86,7 +79,35 @@
             }
         }
 
-        // Tính khoảng cách (Haversine formula)
+        // Gọi Foursquare API để lấy danh sách quán ăn
+        async function fetchFoursquareRestaurants(lat, lon) {
+            const apiKey = 'fsq36fWlZllX51osgrOaFUnPSjuI8taAVgeRIcXGPHWJ5Ac='; // Thay bằng API Key của bạn
+            const url = `https://api.foursquare.com/v3/places/search?ll=${lat},${lon}&radius=5000&categories=13065`;
+            const headers = {
+                'Authorization': apiKey,
+                'Accept': 'application/json'
+            };
+
+            try {
+                const response = await fetch(url, { headers });
+                if (!response.ok) throw new Error('Lỗi từ server Foursquare');
+                const data = await response.json();
+                return data.results.map(place => ({
+                    name: place.name,
+                    lat: place.geocodes.main.latitude,
+                    lon: place.geocodes.main.longitude,
+                    menu: place.categories.map(c => c.name).join(', '),
+                    distance: 0
+                }));
+            } catch (error) {
+                console.error('Lỗi khi lấy dữ liệu từ Foursquare:', error);
+                document.getElementById('locationStatus').textContent = 
+                    "Không thể tải danh sách quán ăn";
+                return [];
+            }
+        }
+
+        // Tính khoảng cách
         function calculateDistance(lat1, lon1, lat2, lon2) {
             const R = 6371; // Bán kính Trái Đất (km)
             const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -98,10 +119,11 @@
             return R * c; // Khoảng cách tính bằng km
         }
 
-        // Tìm và hiển thị quán ăn gần đây
-        function findNearbyRestaurants() {
+        // Lấy và hiển thị danh sách quán ăn
+        async function fetchAndDisplayRestaurants() {
             if (!userLocation) return;
 
+            const restaurants = await fetchFoursquareRestaurants(userLocation.lat, userLocation.lon);
             const restaurantList = document.getElementById('restaurantList');
             restaurantList.innerHTML = '';
 
