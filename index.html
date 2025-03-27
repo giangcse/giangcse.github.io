@@ -1,385 +1,479 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
-    <title>Tìm Quán Ăn Gần Đây</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio - Phan Thanh Giảng</title>
+    <!-- Include Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Include Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        /* Add a subtle transition for the main button text change */
-        #tg-main-button {
-            transition: background-color 0.3s ease, color 0.3s ease;
+        /* Custom styles for fade-in animation */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            /* Optional: slight move up effect */
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
         }
-        /* Custom scrollbar for restaurant list (optional, but nice) */
-        #restaurantList::-webkit-scrollbar {
-            width: 6px;
+
+        .fade-in.is-visible {
+            opacity: 1;
+            transform: translateY(0);
         }
-        #restaurantList::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
+
+        /* Add delays for staggered effect */
+        .delay-100 {
+            transition-delay: 0.1s;
         }
-        #restaurantList::-webkit-scrollbar-thumb {
-            background: #cbd5e1; /* slate-300 */
-            border-radius: 10px;
+
+        .delay-200 {
+            transition-delay: 0.2s;
         }
-        #restaurantList::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; /* slate-400 */
+
+        .delay-300 {
+            transition-delay: 0.3s;
+        }
+
+        .delay-400 {
+            transition-delay: 0.4s;
+        }
+
+        .delay-500 {
+            transition-delay: 0.5s;
+        }
+
+        /* Ensure icons have consistent width for alignment */
+        .fa-fw {
+            width: 1.25em;
+            /* Adjust if needed based on icon size */
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-indigo-50 via-white to-blue-50 min-h-screen font-sans antialiased">
-    <div class="container mx-auto px-4 py-6 sm:py-8 max-w-3xl">
-        <header class="text-center mb-6 sm:mb-8">
-            <h1 class="text-3xl sm:text-4xl font-bold text-indigo-800">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 sm:h-10 sm:w-10 inline-block mr-2 -mt-1" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M5.05 3.05a7 7 0 000 9.9L10 18.9l4.95-5.95a7 7 0 10-9.9-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-                </svg>
-                Tìm Quán Ăn Gần Bạn
-            </h1>
+
+<body class="bg-gradient-to-br from-blue-50 via-white to-indigo-50 text-gray-800 font-sans">
+
+    <div class="container mx-auto px-4 py-12">
+
+        <!-- Hero Section -->
+        <header class="text-center mb-16 fade-in">
+            <img src="asset/avatar.png"  alt="Avatar của Phan Thanh Giảng" class="w-32 h-32 rounded-full object-cover mx-auto mb-4 shadow-lg border-2 border-white">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-2" id="fullName"></h1>
+            <p class="text-xl md:text-2xl text-indigo-600 font-medium" id="jobTitle"></p>
         </header>
 
-        <!-- Location Status -->
-        <div id="locationStatusWrapper" class="mb-6 transition-all duration-300 ease-in-out">
-            <div id="locationStatus" class="p-4 rounded-xl shadow-md text-sm sm:text-base flex items-center justify-center space-x-3 bg-blue-100 text-blue-800 border border-blue-200">
-                <!-- Loading State (Default) -->
-                <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span>Đang xác định vị trí của bạn...</span>
-            </div>
-        </div>
-
-        <!-- Restaurant List -->
-        <div class="restaurant-list space-y-4" id="restaurantList">
-            <!-- Restaurant cards will be populated here by JavaScript -->
-            <!-- Example structure (for reference):
-            <div class="bg-white p-4 sm:p-5 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 ease-in-out cursor-pointer flex items-center space-x-4">
-                <div class="flex-shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-indigo-500" viewBox="0 0 20 20" fill="currentColor"> <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /> </svg>
+        <!-- About Section - Enhanced -->
+        <section class="mb-12 fade-in delay-100">
+            <div class="bg-white rounded-lg shadow-xl p-6 md:p-8 border border-gray-200">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-3 border-indigo-200 flex items-center">
+                    <i class="fas fa-user-circle text-indigo-500 mr-3 text-2xl"></i> <!-- User Icon -->
+                    Thông tin cá nhân
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-gray-700">
+                    <div class="flex items-start p-3 rounded-lg hover:bg-indigo-50 transition duration-200 group">
+                        <i
+                            class="fas fa-id-card fa-fw text-indigo-400 group-hover:text-indigo-600 mr-3 mt-1 text-lg"></i>
+                        <div>
+                            <strong class="font-medium text-gray-900 block">Họ và tên:</strong>
+                            <span id="vietnameseName"></span>
+                        </div>
+                    </div>
+                    <div class="flex items-start p-3 rounded-lg hover:bg-indigo-50 transition duration-200 group">
+                        <i
+                            class="fas fa-cake-candles fa-fw text-indigo-400 group-hover:text-indigo-600 mr-3 mt-1 text-lg"></i>
+                        <div>
+                            <strong class="font-medium text-gray-900 block">Tuổi:</strong>
+                            <span id="age"></span>
+                        </div>
+                    </div>
+                    <div class="flex items-start p-3 rounded-lg hover:bg-indigo-50 transition duration-200 group">
+                        <i
+                            class="fas fa-venus-mars fa-fw text-indigo-400 group-hover:text-indigo-600 mr-3 mt-1 text-lg"></i>
+                        <div>
+                            <strong class="font-medium text-gray-900 block">Giới tính:</strong>
+                            <span id="sex"></span>
+                        </div>
+                    </div>
+                    <div class="flex items-start p-3 rounded-lg hover:bg-indigo-50 transition duration-200 group">
+                        <i
+                            class="fas fa-map-marker-alt fa-fw text-indigo-400 group-hover:text-indigo-600 mr-3 mt-1 text-lg"></i>
+                        <div>
+                            <strong class="font-medium text-gray-900 block">Quê quán:</strong>
+                            <span id="homeTown"></span>
+                        </div>
+                    </div>
+                    <div class="flex items-start p-3 rounded-lg hover:bg-indigo-50 transition duration-200 group">
+                        <i class="fas fa-flag fa-fw text-indigo-400 group-hover:text-indigo-600 mr-3 mt-1 text-lg"></i>
+                        <div>
+                            <strong class="font-medium text-gray-900 block">Quốc tịch:</strong>
+                            <span id="nationality"></span>
+                        </div>
+                    </div>
+                    <div class="flex items-start p-3 rounded-lg hover:bg-indigo-50 transition duration-200 group">
+                        <i
+                            class="fas fa-laptop-code fa-fw text-indigo-400 group-hover:text-indigo-600 mr-3 mt-1 text-lg"></i>
+                        <div>
+                            <strong class="font-medium text-gray-900 block">Chuyên ngành:</strong>
+                            <span id="major"></span>
+                        </div>
+                    </div>
+                    <div class="flex items-start p-3 rounded-lg hover:bg-indigo-50 transition duration-200 group">
+                        <i
+                            class="fas fa-graduation-cap fa-fw text-indigo-400 group-hover:text-indigo-600 mr-3 mt-1 text-lg"></i>
+                        <div>
+                            <strong class="font-medium text-gray-900 block">Trường:</strong>
+                            <span id="university"></span>
+                        </div>
+                    </div>
+                    <div class="flex items-start p-3 rounded-lg hover:bg-indigo-50 transition duration-200 group">
+                        <i
+                            class="fas fa-briefcase fa-fw text-indigo-400 group-hover:text-indigo-600 mr-3 mt-1 text-lg"></i>
+                        <div>
+                            <strong class="font-medium text-gray-900 block">Nơi làm việc:</strong>
+                            <span id="workAt"></span>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex-grow">
-                    <h3 class="text-lg sm:text-xl font-semibold text-gray-800 mb-1">Tên Quán Ăn</h3>
-                    <p class="text-sm text-gray-600 flex items-center mb-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7" /> </svg>
-                        <span>Menu: Phở, Bún</span>
-                    </p>
-                    <p class="text-sm text-indigo-600 font-medium flex items-center">
-                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" viewBox="0 0 20 20" fill="currentColor"> <path fill-rule="evenodd" d="M12 1.5a.75.75 0 01.75.75V4.5h1.5a.75.75 0 010 1.5H12a.75.75 0 01-.75-.75V2.25A.75.75 0 0112 1.5zM5.028 3.75a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5H5.778a.75.75 0 01-.75-.75zM9.25 9.75A.75.75 0 0110 9h1.5a.75.75 0 010 1.5H10a.75.75 0 01-.75-.75zM5.028 15.75a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5H5.778a.75.75 0 01-.75-.75zM7 6.25A.75.75 0 007.75 7h4.5a.75.75 0 000-1.5h-4.5A.75.75 0 007 6.25zM7 12.25A.75.75 0 007.75 13h4.5a.75.75 0 000-1.5h-4.5A.75.75 0 007 12.25zM9.25 15.75a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5a.75.75 0 01-.75-.75z" clip-rule="evenodd" /> </svg>
-                        <span>Khoảng cách: 1.23 km</span>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section class="mb-12 fade-in delay-200">
+            <div class="bg-white rounded-lg shadow-xl p-6 md:p-8 border border-gray-200">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-3 border-green-200 flex items-center">
+                    <i class="fas fa-cogs text-green-500 mr-3 text-xl"></i> <!-- Skills Icon -->
+                    Kỹ năng & Công nghệ
+                </h2>
+                <div class="mb-6">
+                    <h3 class="text-lg font-medium text-gray-700 mb-3">Lĩnh vực chính:</h3>
+                    <div class="flex flex-wrap gap-3" id="skillsList">
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <h3 class="text-lg font-medium text-gray-700 mb-3">Ngôn ngữ lập trình:</h3>
+                    <div class="flex flex-wrap gap-3" id="languagesList">
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-medium text-gray-700 mb-3">Cơ sở dữ liệu:</h3>
+                    <div class="flex flex-wrap gap-3" id="databasesList">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section - Using GitHub REST API (No Auth) -->
+        <section class="mb-12 fade-in delay-300">
+            <div class="bg-white rounded-lg shadow-xl p-6 md:p-8 border border-gray-200">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-3 border-purple-200 flex items-center">
+                    <i class="fab fa-github text-purple-500 mr-3 text-xl"></i> <!-- GitHub Icon -->
+                    Dự án Công khai Nổi bật
+                </h2>
+                <div id="projectsList" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <p id="loadingProjects" class="text-gray-500 md:col-span-2">
+                        <i class="fas fa-spinner fa-spin mr-2"></i>Đang tải dự án từ GitHub...
                     </p>
                 </div>
-                 <div class="flex-shrink-0">
-                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"> <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /> </svg>
-                 </div>
             </div>
-            -->
-        </div>
+        </section>
 
-        <!-- Footer Placeholder (optional) -->
-        <footer class="text-center mt-8 text-xs text-gray-400">
-            Made by giangcse
+        <!-- Contact Section -->
+        <section class="text-center fade-in delay-400">
+            <div class="bg-white rounded-lg shadow-xl p-6 md:p-8 border border-gray-200">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center justify-center">
+                    <i class="fas fa-envelope-open-text text-red-500 mr-3 text-xl"></i> <!-- Contact Icon -->
+                    Liên hệ
+                </h2>
+                <div class="flex justify-center items-center gap-6 mb-4">
+                    <a id="emailLink" href="#"
+                        class="text-gray-600 hover:text-indigo-600 transition duration-300 text-lg flex items-center p-2 rounded hover:bg-gray-100">
+                        <i class="fas fa-envelope mr-2"></i> <span id="emailAddress"></span>
+                    </a>
+                </div>
+                <div class="flex justify-center gap-6 mt-4" id="socialLinksContainer">
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center mt-16 text-gray-500 text-sm fade-in delay-500">
+            © <span id="currentYear"></span> Phan Thanh Giảng. All rights reserved.
         </footer>
 
     </div>
 
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        let userLocation = null;
-        const apiKey = 'fsq36fWlZllX51osgrOaFUnPSjuI8taAVgeRIcXGPHWJ5Ac='; // Thay bằng Foursquare API Key
-        const locationStatusDiv = document.getElementById('locationStatus');
-        const restaurantListDiv = document.getElementById('restaurantList');
-        let selectedRestaurant = null; // Track the selected restaurant DOM element
-
-        // Icons (inline SVGs for simplicity)
-        const ICONS = {
-            loading: `<svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`,
-            success: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>`,
-            error: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v4a1 1 0 102 0V7zm-1 7a1 1 0 110-2 1 1 0 010 2z" clip-rule="evenodd" /></svg>`,
-            restaurant: `<svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-indigo-500" viewBox="0 0 20 20" fill="currentColor"> <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /> </svg>`,
-            menu: `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7" /> </svg>`,
-            distance: `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" viewBox="0 0 20 20" fill="currentColor"> <path fill-rule="evenodd" d="M5.05 3.05a7 7 0 000 9.9L10 18.9l4.95-5.95a7 7 0 10-9.9-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /> </svg>`,
-            chevron: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 group-hover:text-indigo-600 transition-colors" viewBox="0 0 20 20" fill="currentColor"> <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /> </svg>`
+        // --- Dữ liệu Portfolio tĩnh ---
+        const portfolioData = {
+            "firstName": "Giang",
+            "lastName": "Phan",
+            "vietnameseFullName": "Phan Thanh Giảng",
+            "dayOfBirdth": "1997-08-28",
+            "sex": "male",
+            "email": "giangpt@duck.com",
+            "homeTown": "Vĩnh Long",
+            "nationality": "Việt Nam",
+            "major": "Khoa học máy tính",
+            "university": "Đại học Cần Thơ (CTU)",
+            "job": "Developer",
+            "workAt": "VNPT Vĩnh Long",
+            "socialLinks": {
+                "facebook": "https://www.facebook.com/giangpt2808",
+                "telegram": "https://t.me/giangisnotdev",
+                "twitter": "https://www.twitter.com/giangpt2808"
+            },
+            "skills": [
+                "Backend developer",
+                "AI Application",
+                "Operation"
+            ],
+            "programingLanguages": [
+                "Python",
+                "PHP",
+                "JavaScript"
+            ],
+            "databases": [
+                "SQL Server",
+                "MongoDB"
+            ],
+             // "projects" array is no longer used to display projects,
+             // but can be kept if needed for other purposes.
+             "projects": []
         };
 
-        // Update Location Status UI
-        function updateLocationStatus(type, message) {
-            let icon = ICONS.loading;
-            let bgColor = 'bg-blue-100';
-            let textColor = 'text-blue-800';
-            let borderColor = 'border-blue-200';
-
-            if (type === 'success') {
-                icon = ICONS.success;
-                bgColor = 'bg-green-100';
-                textColor = 'text-green-800';
-                borderColor = 'border-green-200';
-            } else if (type === 'error') {
-                icon = ICONS.error;
-                bgColor = 'bg-red-100';
-                textColor = 'text-red-800';
-                borderColor = 'border-red-200';
+        // --- Hàm tiện ích ---
+        // Function to calculate age
+        function calculateAge(birthDateString) {
+            const birthDate = new Date(birthDateString);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
             }
-
-            locationStatusDiv.className = `p-4 rounded-xl shadow-md text-sm sm:text-base flex items-center justify-center space-x-3 ${bgColor} ${textColor} ${borderColor} border`;
-            locationStatusDiv.innerHTML = `${icon} <span>${message}</span>`;
+            return age;
         }
 
-        // Tự động lấy vị trí khi trang web được tải
-        window.onload = function () {
-            getLocation();
-        };
+        // --- GitHub Public Repositories (REST API v3 - No Auth) ---
+        const GITHUB_USERNAME = "giangcse"; // <<<==== THAY THẾ BẰNG USERNAME GITHUB CỦA BẠN
 
-        // Lấy vị trí người dùng
-        function getLocation() {
-            updateLocationStatus('loading', 'Đang xác định vị trí của bạn...');
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    async (position) => {
-                        userLocation = {
-                            lat: position.coords.latitude,
-                            lon: position.coords.longitude
-                        };
-                        const address = await getAddressFromFoursquare(userLocation.lat, userLocation.lon);
+        // Hàm lấy và hiển thị các public repo, sắp xếp theo số sao
+        async function fetchPublicRepos() {
+            const projectsList = document.getElementById('projectsList');
+            const loadingIndicator = document.getElementById('loadingProjects');
+            const numberOfReposToShow = 6; // Số lượng repo muốn hiển thị
 
-                        if (address && address !== 'Không xác định địa danh' && address !== 'Lỗi khi lấy địa danh') {
-                            updateLocationStatus('success', `Vị trí hiện tại: ${address}`);
-                        } else {
-                            updateLocationStatus('warning', `Vị trí tọa độ: ${userLocation.lat.toFixed(4)}, ${userLocation.lon.toFixed(4)} (Không lấy được tên địa danh)`);
-                            // Optional: use warning colors if needed, here keeping it neutral/blue-ish
-                            locationStatusDiv.className = `p-4 rounded-xl shadow-md text-sm sm:text-base flex items-center justify-center space-x-3 bg-yellow-100 text-yellow-800 border-yellow-200 border`;
-                            locationStatusDiv.innerHTML = `${ICONS.error} <span>Vị trí: ${userLocation.lat.toFixed(4)}, ${userLocation.lon.toFixed(4)} (Không lấy được tên địa danh)</span>`;
-                        }
+            if (!GITHUB_USERNAME || GITHUB_USERNAME === "TEN_GITHUB_CUA_BAN") {
+                if(loadingIndicator) loadingIndicator.innerHTML = `<i class="fas fa-exclamation-triangle mr-2 text-red-500"></i> Vui lòng cung cấp GitHub Username trong code JS.`;
+                console.error("GitHub Username is missing!");
+                return; // Dừng lại nếu thiếu Username
+            }
 
-                        await fetchAndDisplayRestaurants();
-                    },
-                    (error) => {
-                        console.error("Geolocation error:", error);
-                        let message = "Không thể lấy vị trí: ";
-                        switch(error.code) {
-                            case error.PERMISSION_DENIED: message += "Bạn đã từ chối yêu cầu định vị."; break;
-                            case error.POSITION_UNAVAILABLE: message += "Thông tin vị trí không khả dụng."; break;
-                            case error.TIMEOUT: message += "Yêu cầu định vị hết hạn."; break;
-                            default: message += error.message; break;
-                        }
-                         updateLocationStatus('error', message);
-                    },
-                    {
-                        enableHighAccuracy: true, // Cố gắng lấy vị trí chính xác hơn
-                        timeout: 10000, // Thời gian chờ tối đa 10 giây
-                        maximumAge: 0 // Không sử dụng vị trí đã cache
+            // Endpoint REST API v3
+            const apiUrl = `https://api.github.com/users/${GITHUB_USERNAME}/repos?type=owner&sort=pushed&per_page=100`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    headers: { 'Accept': 'application/vnd.github.v3+json' }
+                });
+
+                if (!response.ok) {
+                    let errorMsg = `GitHub API error: ${response.status} ${response.statusText}`;
+                    if (response.status === 403) {
+                        errorMsg += ". Có thể bạn đã vượt quá giới hạn yêu cầu API không cần xác thực.";
+                        console.warn("GitHub API Rate Limit likely exceeded.");
+                    } else if (response.status === 404) {
+                         errorMsg += ". Không tìm thấy user GitHub.";
+                         console.warn("GitHub user not found.");
                     }
-                );
-            } else {
-                updateLocationStatus('error', "Trình duyệt của bạn không hỗ trợ định vị.");
-            }
-        }
-
-        // Lấy địa danh từ Foursquare Places API
-        async function getAddressFromFoursquare(lat, lon) {
-             // Using reverse geocode endpoint might be better for just getting address
-            const url = `https://api.foursquare.com/v3/places/nearby?ll=${lat},${lon}&radius=100&limit=1&fields=location`;
-            const headers = {
-                'Authorization': apiKey,
-                'Accept': 'application/json'
-            };
-
-            try {
-                const response = await fetch(url, { headers });
-                if (!response.ok) throw new Error(`Lỗi Foursquare: ${response.statusText}`);
-                const data = await response.json();
-                // console.log("Foursquare Geocode Response:", data); // Debug
-                if (data.results && data.results.length > 0 && data.results[0].location) {
-                     // Combine address parts for a more complete address if available
-                    const loc = data.results[0].location;
-                    return loc.formatted_address || loc.address || loc.cross_street || 'Không xác định địa danh';
+                    throw new Error(errorMsg);
                 }
-                return 'Không xác định địa danh';
+
+                const repos = await response.json();
+
+                // Xóa trạng thái loading/error cũ (nếu tồn tại)
+                if (loadingIndicator) loadingIndicator.remove();
+
+                if (Array.isArray(repos) && repos.length > 0) {
+                    // Sắp xếp theo số sao giảm dần
+                    repos.sort((a, b) => b.stargazers_count - a.stargazers_count);
+
+                    // Lấy top N repo
+                    const topRepos = repos.slice(0, numberOfReposToShow);
+
+                    if (topRepos.length === 0) {
+                        projectsList.innerHTML = '<p class="text-gray-500 md:col-span-2">Không tìm thấy repository công khai nào.</p>';
+                        return;
+                    }
+
+                    // Xóa nội dung cũ trong projectsList trước khi thêm mới
+                    projectsList.innerHTML = '';
+
+                    topRepos.forEach(repo => {
+                        const card = document.createElement('div');
+                        card.className = 'bg-gray-50 border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col justify-between';
+
+                        let language = repo.language || 'N/A';
+
+                        card.innerHTML = `
+                            <div>
+                                <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" class="block mb-2">
+                                    <h3 class="text-lg font-semibold text-blue-700 hover:text-blue-900 truncate">
+                                        <i class="fas fa-book-bookmark mr-2 text-gray-500"></i>${repo.name}
+                                    </h3>
+                                </a>
+                                <p class="text-gray-600 text-sm mb-3 min-h-[40px]">
+                                    ${repo.description || '<i>Không có mô tả.</i>'}
+                                </p>
+                            </div>
+                            <div class="flex items-center justify-between text-sm text-gray-500 mt-auto pt-3 border-t border-gray-200">
+                                <div class="flex items-center space-x-4">
+                                    <span class="flex items-center" title="Ngôn ngữ chính">
+                                        <i class="fas fa-circle fa-xs mr-1" style="color: #ccc;"></i>
+                                        ${language}
+                                    </span>
+                                </div>
+                                <div class="flex items-center space-x-4">
+                                    <span class="flex items-center" title="Stars">
+                                        <i class="far fa-star mr-1 text-yellow-500"></i>
+                                        ${repo.stargazers_count}
+                                    </span>
+                                    <span class="flex items-center" title="Forks">
+                                        <i class="fas fa-code-branch mr-1 text-blue-500"></i>
+                                        ${repo.forks_count}
+                                    </span>
+                                </div>
+                            </div>
+                        `;
+                        projectsList.appendChild(card);
+                    });
+                } else if (Array.isArray(repos) && repos.length === 0) {
+                    projectsList.innerHTML = '<p class="text-gray-500 md:col-span-2">Người dùng này không có repository công khai nào.</p>';
+                }
+                 else {
+                    console.error("Unexpected response format from GitHub API:", repos);
+                    throw new Error("Dữ liệu trả về từ GitHub không hợp lệ.");
+                }
+
             } catch (error) {
-                console.error('Lỗi khi lấy địa danh từ Foursquare:', error);
-                return 'Lỗi khi lấy địa danh';
+                console.error('Lỗi khi tải dự án GitHub (Public API):', error);
+                const errorDisplay = document.getElementById('loadingProjects') || document.createElement('p');
+                errorDisplay.id = 'loadingProjects';
+                errorDisplay.className = 'text-red-600 md:col-span-2';
+                errorDisplay.innerHTML = `<i class="fas fa-exclamation-circle mr-2"></i> Đã xảy ra lỗi khi tải dự án từ GitHub. (${error.message})`;
+
+                // Đảm bảo errorDisplay được hiển thị
+                if (!document.getElementById('loadingProjects')) {
+                     projectsList.innerHTML = ''; // Xóa nội dung cũ nếu có
+                     projectsList.appendChild(errorDisplay);
+                } else {
+                    // Nếu loadingIndicator vẫn còn, cập nhật nội dung của nó
+                    loadingIndicator.className = 'text-red-600 md:col-span-2';
+                    loadingIndicator.innerHTML = errorDisplay.innerHTML;
+                }
             }
         }
+        // --- Kết thúc phần GitHub Public Repositories ---
 
-        // Gọi Foursquare API để lấy danh sách quán ăn
-        async function fetchFoursquareRestaurants(lat, lon) {
-            // Category 13065 = Food. Consider adding more specific like 13034 (Café), 13003 (Bar), etc. if needed
-            // Added fields: fsq_id, name, geocodes, categories, location, distance
-            const url = `https://api.foursquare.com/v3/places/search?ll=${lat},${lon}&radius=5000&categories=13065&fields=fsq_id,name,geocodes,categories,location,distance&sort=DISTANCE&limit=30`; // Lấy 30 quán gần nhất
-            const headers = {
-                'Authorization': apiKey,
-                'Accept': 'application/json'
+
+        // --- Chạy khi DOM đã tải xong ---
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Populate dữ liệu tĩnh từ portfolioData ---
+            //document.getElementById('initials').textContent = portfolioData.firstName.charAt(0) + portfolioData.lastName.charAt(0);
+            document.getElementById('fullName').textContent = `${portfolioData.lastName} ${portfolioData.firstName}`;
+            document.getElementById('jobTitle').textContent = `${portfolioData.job} tại ${portfolioData.workAt}`;
+
+            // Thông tin cá nhân
+            document.getElementById('vietnameseName').textContent = portfolioData.vietnameseFullName;
+            document.getElementById('age').textContent = calculateAge(portfolioData.dayOfBirdth);
+            document.getElementById('sex').textContent = portfolioData.sex === 'male' ? 'Nam' : 'Nữ';
+            document.getElementById('homeTown').textContent = portfolioData.homeTown;
+            document.getElementById('nationality').textContent = portfolioData.nationality;
+            document.getElementById('major').textContent = portfolioData.major;
+            document.getElementById('university').textContent = portfolioData.university;
+            document.getElementById('workAt').textContent = portfolioData.workAt;
+
+            // Email
+            document.getElementById('emailAddress').textContent = portfolioData.email;
+            document.getElementById('emailLink').href = `mailto:${portfolioData.email}`;
+
+            // Kỹ năng
+            const skillsList = document.getElementById('skillsList');
+            portfolioData.skills.forEach(skill => {
+                const span = document.createElement('span');
+                span.className = 'bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium shadow-sm hover:bg-blue-200 cursor-default transition';
+                span.textContent = skill;
+                skillsList.appendChild(span);
+            });
+
+            // Ngôn ngữ lập trình
+            const languagesList = document.getElementById('languagesList');
+            portfolioData.programingLanguages.forEach(lang => {
+                const span = document.createElement('span');
+                span.className = 'bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium shadow-sm hover:bg-green-200 cursor-default transition';
+                span.textContent = lang;
+                languagesList.appendChild(span);
+            });
+
+            // Cơ sở dữ liệu
+            const databasesList = document.getElementById('databasesList');
+            portfolioData.databases.forEach(db => {
+                const span = document.createElement('span');
+                span.className = 'bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-medium shadow-sm hover:bg-indigo-200 cursor-default transition';
+                span.textContent = db;
+                databasesList.appendChild(span);
+            });
+
+            // --- Lấy và hiển thị dự án từ GitHub ---
+            fetchPublicRepos(); // Gọi hàm mới để lấy repo công khai
+
+            // --- Populate Liên kết mạng xã hội ---
+            const socialLinksContainer = document.getElementById('socialLinksContainer');
+            const socialIconMap = {
+                facebook: 'fab fa-facebook text-blue-600',
+                telegram: 'fab fa-telegram text-sky-500',
+                twitter: 'fab fa-twitter text-cyan-500'
             };
+            // Xóa link cũ trước khi thêm mới (phòng trường hợp code chạy lại)
+            socialLinksContainer.innerHTML = '';
+            for (const [key, url] of Object.entries(portfolioData.socialLinks)) {
+                const link = document.createElement('a');
+                link.href = url;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.className = 'text-gray-500 hover:text-indigo-600 transition duration-300 text-3xl transform hover:scale-110';
+                link.setAttribute('aria-label', `Link đến ${key}`);
 
-            try {
-                updateLocationStatus('loading', 'Đang tìm quán ăn gần bạn...'); // Update status while fetching
-                const response = await fetch(url, { headers });
-                if (!response.ok) throw new Error(`Lỗi Foursquare Places: ${response.statusText}`);
-                const data = await response.json();
-                // console.log("Foursquare Restaurants Response:", data); // Debug
-
-                // Restore location status message after successful fetch
-                 const address = await getAddressFromFoursquare(userLocation.lat, userLocation.lon); // Re-get for display
-                 if (address && address !== 'Không xác định địa danh' && address !== 'Lỗi khi lấy địa danh') {
-                      updateLocationStatus('success', `Vị trí hiện tại: ${address}`);
-                 } else {
-                      // Keep the warning/error status if geocoding failed before
-                 }
-
-
-                return data.results.map(place => ({
-                    id: place.fsq_id,
-                    name: place.name || 'N/A',
-                    lat: place.geocodes?.main?.latitude || 0,
-                    lon: place.geocodes?.main?.longitude || 0,
-                    // Combine category names, limit length if too long
-                    menu: place.categories?.map(c => c.name).slice(0, 3).join(', ') || 'Chưa rõ',
-                    address: place.location?.formatted_address || 'Chưa rõ địa chỉ',
-                    // Foursquare API provides distance in meters, convert to km
-                    distance: place.distance ? (place.distance / 1000).toFixed(2) : calculateDistance(lat, lon, place.geocodes?.main?.latitude || 0, place.geocodes?.main?.longitude || 0).toFixed(2)
-                }));
-            } catch (error) {
-                console.error('Lỗi khi lấy dữ liệu quán ăn từ Foursquare:', error);
-                updateLocationStatus('error', "Không thể tải danh sách quán ăn. Vui lòng thử lại.");
-                return [];
-            }
-        }
-
-        // Tính khoảng cách Haversine (dự phòng nếu API không trả về distance)
-        function calculateDistance(lat1, lon1, lat2, lon2) {
-            if (!lat1 || !lon1 || !lat2 || !lon2) return 0;
-            const R = 6371; // Bán kính Trái Đất (km)
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                      Math.sin(dLon/2) * Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c; // Khoảng cách tính bằng km
-        }
-
-        // Lấy và hiển thị danh sách quán ăn
-        async function fetchAndDisplayRestaurants() {
-            if (!userLocation) {
-                 updateLocationStatus('error', "Chưa có vị trí để tìm quán ăn.");
-                 return;
+                const icon = document.createElement('i');
+                const baseIconClasses = socialIconMap[key] || 'fas fa-link text-gray-500';
+                icon.className = `${baseIconClasses}`;
+                link.appendChild(icon);
+                socialLinksContainer.appendChild(link);
             }
 
-            const restaurants = await fetchFoursquareRestaurants(userLocation.lat, userLocation.lon);
-            restaurantListDiv.innerHTML = ''; // Xóa danh sách cũ
+             // --- Cập nhật năm ở Footer ---
+             document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-            if (restaurants.length === 0) {
-                restaurantListDiv.innerHTML = '<p class="text-center text-gray-500 mt-6">Không tìm thấy quán ăn nào gần bạn trong bán kính 5km.</p>';
-                Telegram.WebApp.MainButton.hide(); // Hide button if no results
-                return;
-            }
+            // --- Kích hoạt hiệu ứng Fade-in ---
+            // Dùng setTimeout nhỏ để đảm bảo trình duyệt đã render xong DOM ban đầu
+            setTimeout(() => {
+                const elementsToFade = document.querySelectorAll('.fade-in');
+                elementsToFade.forEach(el => {
+                    // Lấy giá trị delay từ class (nếu có)
+                    const delay = parseInt(el.className.match(/delay-(\d+)/)?.[1] || '0');
+                    // Thêm class is-visible sau khoảng delay tương ứng
+                    setTimeout(() => {
+                         el.classList.add('is-visible');
+                    }, delay);
+                });
+            }, 50); // Delay tổng thể ban đầu trước khi bắt đầu các animation
 
-            restaurants.forEach(restaurant => {
-                const div = document.createElement('div');
-                // Add 'group' class for hover effects on child elements (like chevron)
-                div.className = 'group bg-white p-4 sm:p-5 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 ease-in-out cursor-pointer flex items-center space-x-4';
-                div.innerHTML = `
-                    <div class="flex-shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
-                        ${ICONS.restaurant}
-                    </div>
-                    <div class="flex-grow min-w-0"> <!-- min-w-0 prevents text overflow issues -->
-                        <h3 class="text-lg sm:text-xl font-semibold text-gray-800 mb-1 truncate" title="${restaurant.name}">${restaurant.name}</h3>
-                        <p class="text-sm text-gray-600 flex items-center mb-1 truncate" title="${restaurant.menu}">
-                            ${ICONS.menu}
-                            <span class="ml-1.5"> ${restaurant.menu}</span>
-                        </p>
-                        <p class="text-sm text-indigo-600 font-medium flex items-center">
-                            ${ICONS.distance}
-                             <span class="ml-1.5">${restaurant.distance} km</span>
-                        </p>
-                         <p class="text-xs text-gray-500 mt-1 truncate" title="${restaurant.address}"> ${restaurant.address} </p> <!-- Added Address -->
-                    </div>
-                    <div class="flex-shrink-0 ml-auto pl-2"> <!-- Ensure chevron is pushed right -->
-                        ${ICONS.chevron}
-                    </div>
-                `;
-                div.onclick = () => selectRestaurant(restaurant, div);
-                restaurantListDiv.appendChild(div);
-            });
-        }
-
-        // Chọn quán ăn
-        function selectRestaurant(restaurant, element) {
-            // Remove highlight from previously selected element
-            if (selectedRestaurant) {
-                selectedRestaurant.classList.remove('ring-2', 'ring-indigo-500', 'ring-offset-2');
-            }
-             // Add highlight to the newly selected element
-            element.classList.add('ring-2', 'ring-indigo-500', 'ring-offset-2');
-            selectedRestaurant = element; // Track the selected DOM element
-
-            // Configure and show Telegram Main Button
-            const buttonText = `CHỌN ${restaurant.name.substring(0, 20)}${restaurant.name.length > 20 ? '...' : ''}`; // Shorten name if too long
-            Telegram.WebApp.MainButton.setText(buttonText);
-            Telegram.WebApp.MainButton.show();
-
-             // Store data to be sent when button is clicked
-             // It's better to handle data sending *inside* the mainButtonClicked event
-            Telegram.WebApp.offEvent('mainButtonClicked', handleMainButtonClick); // Remove previous listener
-            Telegram.WebApp.onEvent('mainButtonClicked', () => handleMainButtonClick(restaurant)); // Add new listener with current restaurant data
-        }
-
-        // Handler for the Main Button click
-        function handleMainButtonClick(restaurantData) {
-            if (!restaurantData) return; // Safety check
-
-            console.log("Sending data to Telegram:", restaurantData); // Debug
-            try {
-                 // Send relevant data back to the bot
-                Telegram.WebApp.sendData(JSON.stringify({
-                    action: 'select_restaurant', // Add an action type
-                    restaurant: {
-                        id: restaurantData.id,
-                        name: restaurantData.name,
-                        menu: restaurantData.menu,
-                        distance: restaurantData.distance,
-                        lat: restaurantData.lat,
-                        lon: restaurantData.lon,
-                        address: restaurantData.address
-                    },
-                    userLocation: userLocation // Optionally send user's location too
-                }));
-                 // Optionally provide feedback and close
-                 Telegram.WebApp.MainButton.setParams({text: "ĐÃ GỬI!", is_active: false });
-                 setTimeout(() => {
-                     Telegram.WebApp.close();
-                 }, 1500); // Close after 1.5 seconds
-            } catch (e) {
-                 console.error("Error sending data:", e);
-                 // Maybe show an error message to the user via an alert or status update
-                 Telegram.WebApp.showAlert('Không thể gửi lựa chọn. Vui lòng thử lại.');
-                 Telegram.WebApp.MainButton.setParams({ is_active: true }); // Re-enable button
-            }
-        }
-
-
-        // Khởi tạo Telegram Web App
-        try {
-            Telegram.WebApp.ready();
-            Telegram.WebApp.expand();
-            // Set initial Main Button style (optional)
-            Telegram.WebApp.MainButton.setParams({
-                text: 'CHỌN MỘT QUÁN ĂN',
-                color: '#3730a3', // Indigo-800
-                text_color: '#ffffff',
-                is_visible: false, // Initially hidden
-                is_active: true
-            });
-            // Thiết lập màu nền header của Telegram (optional)
-             Telegram.WebApp.setHeaderColor('#e0e7ff'); // indigo-100
-             Telegram.WebApp.setBackgroundColor('#f0f5ff'); // Lighter gradient start color
-
-        } catch (e) {
-            console.error("Telegram WebApp initialization failed:", e);
-            // Optionally display an error to the user if not in Telegram context
-            // document.body.innerHTML = '<div class="p-4 text-red-700 bg-red-100">Lỗi: Không thể khởi tạo ứng dụng Telegram.</div>';
-        }
-
+        }); // Kết thúc DOMContentLoaded
     </script>
+
 </body>
+
 </html>
