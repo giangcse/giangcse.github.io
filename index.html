@@ -4,51 +4,19 @@
     <meta charset="UTF-8">
     <title>Tìm Quán Ăn Gần Đây</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background-color: #f0f0f0;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        #locationStatus {
-            margin: 10px 0;
-            padding: 10px;
-            background-color: #fff;
-            border-radius: 5px;
-        }
-        .restaurant-list {
-            margin: 20px 0;
-        }
-        .restaurant-item {
-            padding: 15px;
-            margin: 10px 0;
-            background-color: white;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .restaurant-item:hover {
-            background-color: #e0e0e0;
-        }
-        button {
-            padding: 10px 20px;
-            background-color: #0088cc;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="container">
-        <h2>Tìm Quán Ăn Gần Bạn</h2>
-        <button onclick="getLocation()">Lấy vị trí của tôi</button>
-        <div id="locationStatus">Chưa có vị trí</div>
-        <div class="restaurant-list" id="restaurantList"></div>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-2xl">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">Tìm Quán Ăn Gần Bạn</h2>
+        <button onclick="getLocation()"
+            class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">
+            Lấy vị trí của tôi
+        </button>
+        <div id="locationStatus" class="mt-4 p-4 bg-white rounded-lg shadow-sm text-gray-700">
+            Chưa có vị trí
+        </div>
+        <div class="restaurant-list mt-6 space-y-4" id="restaurantList"></div>
     </div>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -160,11 +128,11 @@
                 ).toFixed(2);
 
                 const div = document.createElement('div');
-                div.className = 'restaurant-item';
+                div.className = 'bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition duration-300 cursor-pointer';
                 div.innerHTML = `
-                    <strong>${restaurant.name}</strong><br>
-                    Menu: ${restaurant.menu}<br>
-                    Khoảng cách: ${restaurant.distance} km
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">${restaurant.name}</h3>
+                    <p class="text-gray-600 mb-2">Menu: ${restaurant.menu}</p>
+                    <p class="text-blue-500 font-medium">Khoảng cách: ${restaurant.distance} km</p>
                 `;
                 div.onclick = () => selectRestaurant(restaurant);
                 restaurantList.appendChild(div);
