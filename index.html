@@ -152,6 +152,11 @@
             });
         }
 
+        Telegram.WebApp.onEvent('mainButtonClicked', function() {
+            const result = document.getElementById('result').textContent;
+            Telegram.WebApp.sendData(result);
+        });
+
         // Khởi tạo Telegram Web App
         Telegram.WebApp.ready();
         Telegram.WebApp.expand();
