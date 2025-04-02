@@ -8,8 +8,23 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.6.7/lunar.js"></script>
     <style>
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0px); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        @keyframes shine {
+            0% { background-position: -100% 0; }
+            100% { background-position: 200% 0; }
+        }
         body {
             background: linear-gradient(135deg, #f6f8fc 0%, #e9f0f7 100%);
+            min-height: 100vh;
         }
         .date-picker {
             background-color: #ffffff;
@@ -20,16 +35,34 @@
             font-size: 16px;
             padding: 10px;
             border-radius: 12px;
+            background-image: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
+            background-size: 200% 100%;
         }
         .date-picker:focus {
             border-color: #4f46e5;
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
             outline: none;
+            animation: shine 2s linear infinite;
         }
         .info-card {
             transition: all 0.3s ease;
             border: 1px solid rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        .info-card:hover::before {
+            left: 100%;
         }
         .info-card:hover {
             transform: translateY(-3px);
@@ -38,9 +71,27 @@
         .quick-date-btn {
             transition: all 0.2s ease;
             background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .quick-date-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        .quick-date-btn:hover::after {
+            width: 300px;
+            height: 300px;
         }
         .quick-date-btn:hover {
-            transform: translateY(-1px);
+            transform: translateY(-2px);
             background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
         }
         .quick-date-btn:active {
@@ -48,12 +99,44 @@
         }
         .header-gradient {
             background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .header-gradient::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: translateX(-100%);
+            transition: 0.5s;
+        }
+        .header-gradient:hover::after {
+            transform: translateX(100%);
         }
         .info-gradient {
             background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            transition: all 0.3s ease;
+        }
+        .info-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
         .detail-gradient {
             background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            transition: all 0.3s ease;
+        }
+        .detail-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .icon-animate {
+            animation: float 3s ease-in-out infinite;
+        }
+        .title-animate {
+            animation: pulse 2s ease-in-out infinite;
         }
         @media (max-width: 640px) {
             .container {
@@ -68,7 +151,7 @@
 <body class="min-h-screen py-4">
     <div class="container mx-auto px-3 max-w-2xl">
         <div class="text-center mb-4">
-            <h1 class="text-2xl font-bold text-gray-800">Âm Lịch Việt Nam</h1>
+            <h1 class="text-2xl font-bold text-gray-800 title-animate">Âm Lịch Việt Nam</h1>
             <p class="text-sm text-gray-600">Xem ngày âm lịch và thông tin chi tiết</p>
         </div>
 
@@ -81,31 +164,30 @@
                         <p class="text-sm opacity-90" id="currentDay"></p>
                     </div>
                 </div>
-<div class="p-4">
-    <div class="grid grid-cols-3 gap-2 mb-4">
-        <button data-type="today"
-            class="quick-date-btn text-gray-700 py-2 px-3 rounded-lg text-sm font-medium shadow-sm">
-            Hôm nay
-        </button>
+                <div class="p-4">
+                    <div class="grid grid-cols-3 gap-2 mb-4">
+                        <button data-type="today" class="quick-date-btn text-gray-700 py-2 px-3 rounded-lg text-sm font-medium shadow-sm">
+                            Hôm nay
+                        </button>
                         <button data-type="tomorrow" class="quick-date-btn text-gray-700 py-2 px-3 rounded-lg text-sm font-medium shadow-sm">
                             Ngày mai
                         </button>
                         <button data-type="yesterday" class="quick-date-btn text-gray-700 py-2 px-3 rounded-lg text-sm font-medium shadow-sm">
                             Hôm qua
                         </button>
-                        </div>
-<div>
-    <label class="block text-sm font-medium text-gray-700 mb-2">Hoặc chọn ngày khác:</label>
-    <input type="date" id="datePicker" class="date-picker w-full">
-</div>
-</div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Hoặc chọn ngày khác:</label>
+                        <input type="date" id="datePicker" class="date-picker w-full">
+                    </div>
+                    </div>
             </div>
 
             <!-- Thông tin âm lịch -->
             <div class="space-y-4">
                 <div class="info-card bg-white rounded-xl shadow-lg p-4">
                     <h2 class="text-base font-semibold text-gray-800 mb-3 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 mr-2 text-indigo-500 icon-animate" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
@@ -124,12 +206,12 @@
                             <p class="text-sm text-gray-600">Năm âm lịch:</p>
                             <p class="text-base font-semibold text-gray-800" id="lunarYear"></p>
                         </div>
-                        </div>
-                        </div>
+                    </div>
+                    </div>
 
                 <div class="info-card bg-white rounded-xl shadow-lg p-4">
                     <h2 class="text-base font-semibold text-gray-800 mb-3 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 mr-2 text-emerald-500 icon-animate" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
