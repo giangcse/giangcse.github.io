@@ -146,6 +146,56 @@
                 padding: 0.75rem;
             }
         }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin: 0.25rem;
+        }
+        .badge-good {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        .badge-bad {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        .share-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="min-h-screen py-4">
@@ -176,11 +226,18 @@
                             Hôm qua
                         </button>
                     </div>
-                    <div>
+                    <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Hoặc chọn ngày khác:</label>
                         <input type="date" id="datePicker" class="date-picker w-full">
                     </div>
-                    </div>
+                    <button id="shareBtn" class="share-btn w-full flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                        </svg>
+                        Chia sẻ
+                    </button>
+                </div>
             </div>
 
             <!-- Thông tin âm lịch -->
@@ -207,7 +264,7 @@
                             <p class="text-base font-semibold text-gray-800" id="lunarYear"></p>
                         </div>
                     </div>
-                    </div>
+                </div>
 
                 <div class="info-card bg-white rounded-xl shadow-lg p-4">
                     <h2 class="text-base font-semibold text-gray-800 mb-3 flex items-center">
@@ -232,6 +289,29 @@
                         </div>
                     </div>
                 </div>
+<div class="info-card bg-white rounded-xl shadow-lg p-4">
+    <h2 class="text-base font-semibold text-gray-800 mb-3 flex items-center">
+        <svg class="w-5 h-5 mr-2 text-yellow-500 icon-animate" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Xem ngày tốt/xấu
+    </h2>
+    <div class="grid grid-cols-1 gap-2">
+        <div class="p-3 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50">
+            <p class="text-sm text-gray-600">Việc nên làm:</p>
+            <div id="goodThings" class="flex flex-wrap mt-2">
+                <!-- Sẽ được điền bởi JavaScript -->
+            </div>
+        </div>
+        <div class="p-3 rounded-lg bg-gradient-to-r from-red-50 to-pink-50">
+            <p class="text-sm text-gray-600">Việc nên tránh:</p>
+            <div id="badThings" class="flex flex-wrap mt-2">
+                <!-- Sẽ được điền bởi JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
             </div>
         </div>
     </div>
@@ -250,6 +330,18 @@
                 const DAYS = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
                 const TIET = ['Xuân phân', 'Thanh minh', 'Cốc vũ', 'Lập hạ', 'Tiểu mãn', 'Mang chủng', 'Hạ chí', 'Tiểu thử', 'Đại thử', 'Lập thu', 'Xử thử', 'Bạch lộ', 'Thu phân', 'Hàn lộ', 'Sương giáng', 'Lập đông', 'Tiểu tuyết', 'Đại tuyết', 'Đông chí', 'Tiểu hàn', 'Đại hàn', 'Lập xuân', 'Vũ thủy', 'Kinh trập'];
                 const HOANG_DAO = ['Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tỵ', 'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi'];
+
+                            // Thêm mảng dữ liệu cho việc tốt/xấu
+                            const GOOD_THINGS = [
+                                'Cầu tài', 'Cầu phúc', 'Cầu an', 'Cầu duyên',
+                                'Khai trương', 'Xuất hành', 'Động thổ', 'An táng',
+                                'Cưới hỏi', 'Mừng thọ', 'Khai trương', 'Ký kết'
+                            ];
+                            const BAD_THINGS = [
+                                'Kiện tụng', 'Động thổ', 'An táng', 'Cưới hỏi',
+                                'Khai trương', 'Xuất hành', 'Cầu tài', 'Cầu phúc',
+                                'Cầu an', 'Cầu duyên', 'Mừng thọ', 'Ký kết'
+                            ];
 
                 // Hàm định dạng ngày
                 function formatDate(date) {
@@ -289,10 +381,52 @@
                 
                     const hoangDaoIndex = lunar.getDayZhiIndex();
                     document.getElementById('hoangDao').textContent = HOANG_DAO[hoangDaoIndex];
+
+                        // Cập nhật việc tốt/xấu
+                        updateGoodBadThings(lunar);
             } catch (error) {
                     //console.error('Error updating lunar info:', error);
                 }
             }
+
+                            // Hàm cập nhật việc tốt/xấu
+                            function updateGoodBadThings(lunar) {
+                                const goodThingsDiv = document.getElementById('goodThings');
+                                const badThingsDiv = document.getElementById('badThings');
+
+                                // Xóa nội dung cũ
+                                goodThingsDiv.innerHTML = '';
+                                badThingsDiv.innerHTML = '';
+
+                                // Chọn ngẫu nhiên 4 việc tốt và 4 việc xấu
+                                const goodThings = shuffleArray(GOOD_THINGS).slice(0, 4);
+                                const badThings = shuffleArray(BAD_THINGS).slice(0, 4);
+
+                                // Thêm việc tốt
+                                goodThings.forEach(thing => {
+                                    const badge = document.createElement('span');
+                                    badge.className = 'badge badge-good';
+                                    badge.textContent = thing;
+                                    goodThingsDiv.appendChild(badge);
+                                });
+
+                                // Thêm việc xấu
+                                badThings.forEach(thing => {
+                                    const badge = document.createElement('span');
+                                    badge.className = 'badge badge-bad';
+                                    badge.textContent = thing;
+                                    badThingsDiv.appendChild(badge);
+                                });
+                            }
+
+                            // Hàm xáo trộn mảng
+                            function shuffleArray(array) {
+                                for (let i = array.length - 1; i > 0; i--) {
+                                    const j = Math.floor(Math.random() * (i + 1));
+                                    [array[i], array[j]] = [array[j], array[i]];
+                                }
+                                return array;
+                            }
 
                 // Hàm xử lý chọn ngày nhanh
                 function setDate(type) {
@@ -333,6 +467,37 @@
                         setDate(type);
                 });
             });
+
+    // Thêm sự kiện chia sẻ
+    document.getElementById('shareBtn').addEventListener('click', async () => {
+        const currentDate = document.getElementById('currentDate').textContent;
+        const lunarDay = document.getElementById('lunarDay').textContent;
+        const lunarMonth = document.getElementById('lunarMonth').textContent;
+        const lunarYear = document.getElementById('lunarYear').textContent;
+
+        const shareText = `Ngày ${currentDate}\nÂm lịch: ${lunarDay}\nTháng: ${lunarMonth}\nNăm: ${lunarYear}`;
+
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'Âm Lịch Việt Nam',
+                    text: shareText,
+                    url: window.location.href
+                });
+            } catch (error) {
+                console.error('Error sharing:', error);
+                // Fallback: Copy to clipboard
+                navigator.clipboard.writeText(shareText).then(() => {
+                    alert('Đã sao chép thông tin vào bộ nhớ tạm!');
+                });
+            }
+        } else {
+            // Fallback: Copy to clipboard
+            navigator.clipboard.writeText(shareText).then(() => {
+                alert('Đã sao chép thông tin vào bộ nhớ tạm!');
+            });
+        }
+    });
 </script>
 </body>
 </html>
