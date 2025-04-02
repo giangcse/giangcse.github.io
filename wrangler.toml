@@ -1,0 +1,10 @@
+name = "image-generator"
+main = "worker.js"
+compatibility_date = "2025-04-02"
+
+[vars]
+# Các biến môi trường có thể được thêm vào đây
+
+# Các dependencies cần thiết
+[build]
+command = "npm install @google/generative-ai" 
