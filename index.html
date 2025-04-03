@@ -289,37 +289,11 @@
                         </div>
                     </div>
                 </div>
-<div class="info-card bg-white rounded-xl shadow-lg p-4">
-    <h2 class="text-base font-semibold text-gray-800 mb-3 flex items-center">
-        <svg class="w-5 h-5 mr-2 text-yellow-500 icon-animate" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        Xem ngày tốt/xấu
-    </h2>
-    <div class="grid grid-cols-1 gap-2">
-        <div class="p-3 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50">
-            <p class="text-sm text-gray-600">Việc nên làm:</p>
-            <div id="goodThings" class="flex flex-wrap mt-2">
-                <!-- Sẽ được điền bởi JavaScript -->
-            </div>
-        </div>
-        <div class="p-3 rounded-lg bg-gradient-to-r from-red-50 to-pink-50">
-            <p class="text-sm text-gray-600">Việc nên tránh:</p>
-            <div id="badThings" class="flex flex-wrap mt-2">
-                <!-- Sẽ được điền bởi JavaScript -->
-            </div>
-        </div>
-    </div>
-</div>
             </div>
         </div>
     </div>
 
     <script>
-                // Kiểm tra thư viện Lunar
-                //console.log('Lunar library:', typeof Lunar);
-
                 // Khởi tạo Telegram WebApp
                 const tg = window.Telegram.WebApp;
                 tg.expand();
@@ -330,18 +304,6 @@
                 const DAYS = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
                 const TIET = ['Xuân phân', 'Thanh minh', 'Cốc vũ', 'Lập hạ', 'Tiểu mãn', 'Mang chủng', 'Hạ chí', 'Tiểu thử', 'Đại thử', 'Lập thu', 'Xử thử', 'Bạch lộ', 'Thu phân', 'Hàn lộ', 'Sương giáng', 'Lập đông', 'Tiểu tuyết', 'Đại tuyết', 'Đông chí', 'Tiểu hàn', 'Đại hàn', 'Lập xuân', 'Vũ thủy', 'Kinh trập'];
                 const HOANG_DAO = ['Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tỵ', 'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi'];
-
-                            // Thêm mảng dữ liệu cho việc tốt/xấu
-                            const GOOD_THINGS = [
-                                'Cầu tài', 'Cầu phúc', 'Cầu an', 'Cầu duyên',
-                                'Khai trương', 'Xuất hành', 'Động thổ', 'An táng',
-                                'Cưới hỏi', 'Mừng thọ', 'Khai trương', 'Ký kết'
-                            ];
-                            const BAD_THINGS = [
-                                'Kiện tụng', 'Động thổ', 'An táng', 'Cưới hỏi',
-                                'Khai trương', 'Xuất hành', 'Cầu tài', 'Cầu phúc',
-                                'Cầu an', 'Cầu duyên', 'Mừng thọ', 'Ký kết'
-                            ];
 
                 // Hàm định dạng ngày
                 function formatDate(date) {
@@ -361,8 +323,7 @@
                 function updateLunarInfo(date) {
                     try {
                         const lunar = Lunar.fromDate(date);
-                //console.log('Lunar date:', lunar);
-            
+
                     // Cập nhật hiển thị ngày hiện tại
                     updateCurrentDateDisplay(date);
                 
@@ -381,52 +342,10 @@
                 
                     const hoangDaoIndex = lunar.getDayZhiIndex();
                     document.getElementById('hoangDao').textContent = HOANG_DAO[hoangDaoIndex];
-
-                        // Cập nhật việc tốt/xấu
-                        updateGoodBadThings(lunar);
             } catch (error) {
-                    //console.error('Error updating lunar info:', error);
+                    console.error('Error updating lunar info:', error);
                 }
             }
-
-                            // Hàm cập nhật việc tốt/xấu
-                            function updateGoodBadThings(lunar) {
-                                const goodThingsDiv = document.getElementById('goodThings');
-                                const badThingsDiv = document.getElementById('badThings');
-
-                                // Xóa nội dung cũ
-                                goodThingsDiv.innerHTML = '';
-                                badThingsDiv.innerHTML = '';
-
-                                // Chọn ngẫu nhiên 4 việc tốt và 4 việc xấu
-                                const goodThings = shuffleArray(GOOD_THINGS).slice(0, 4);
-                                const badThings = shuffleArray(BAD_THINGS).slice(0, 4);
-
-                                // Thêm việc tốt
-                                goodThings.forEach(thing => {
-                                    const badge = document.createElement('span');
-                                    badge.className = 'badge badge-good';
-                                    badge.textContent = thing;
-                                    goodThingsDiv.appendChild(badge);
-                                });
-
-                                // Thêm việc xấu
-                                badThings.forEach(thing => {
-                                    const badge = document.createElement('span');
-                                    badge.className = 'badge badge-bad';
-                                    badge.textContent = thing;
-                                    badThingsDiv.appendChild(badge);
-                                });
-                            }
-
-                            // Hàm xáo trộn mảng
-                            function shuffleArray(array) {
-                                for (let i = array.length - 1; i > 0; i--) {
-                                    const j = Math.floor(Math.random() * (i + 1));
-                                    [array[i], array[j]] = [array[j], array[i]];
-                                }
-                                return array;
-                            }
 
                 // Hàm xử lý chọn ngày nhanh
                 function setDate(type) {
@@ -468,36 +387,36 @@
                 });
             });
 
-    // Thêm sự kiện chia sẻ
-    document.getElementById('shareBtn').addEventListener('click', async () => {
-        const currentDate = document.getElementById('currentDate').textContent;
-        const lunarDay = document.getElementById('lunarDay').textContent;
-        const lunarMonth = document.getElementById('lunarMonth').textContent;
-        const lunarYear = document.getElementById('lunarYear').textContent;
+                // Thêm sự kiện chia sẻ
+                document.getElementById('shareBtn').addEventListener('click', async () => {
+                    const currentDate = document.getElementById('currentDate').textContent;
+                    const lunarDay = document.getElementById('lunarDay').textContent;
+                    const lunarMonth = document.getElementById('lunarMonth').textContent;
+                    const lunarYear = document.getElementById('lunarYear').textContent;
 
-        const shareText = `Ngày ${currentDate}\nÂm lịch: ${lunarDay}\nTháng: ${lunarMonth}\nNăm: ${lunarYear}`;
+                const shareText = `Ngày ${currentDate}\nÂm lịch: ${lunarDay}\nTháng: ${lunarMonth}\nNăm: ${lunarYear}`;
 
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: 'Âm Lịch Việt Nam',
-                    text: shareText,
-                    url: window.location.href
-                });
-            } catch (error) {
-                console.error('Error sharing:', error);
-                // Fallback: Copy to clipboard
-                navigator.clipboard.writeText(shareText).then(() => {
-                    alert('Đã sao chép thông tin vào bộ nhớ tạm!');
-                });
-            }
-        } else {
-            // Fallback: Copy to clipboard
-            navigator.clipboard.writeText(shareText).then(() => {
-                alert('Đã sao chép thông tin vào bộ nhớ tạm!');
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: 'Âm Lịch Việt Nam',
+                            text: shareText,
+                            url: window.location.href
+                        });
+                    } catch (error) {
+                        console.error('Error sharing:', error);
+                        // Fallback: Copy to clipboard
+                        navigator.clipboard.writeText(shareText).then(() => {
+                            alert('Đã sao chép thông tin vào bộ nhớ tạm!');
+                        });
+                    }
+                } else {
+                    // Fallback: Copy to clipboard
+                    navigator.clipboard.writeText(shareText).then(() => {
+                        alert('Đã sao chép thông tin vào bộ nhớ tạm!');
+                    });
+                }
             });
-        }
-    });
-</script>
+                </script>
 </body>
 </html>
