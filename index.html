@@ -3,420 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Âm Lịch Việt Nam</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Đồng hồ Kỹ thuật số</title>
+    <!-- Tải Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.6.7/lunar.js"></script>
+    <!-- Tải Font Public Sans từ Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <style>
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-5px); }
-            100% { transform: translateY(0px); }
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        @keyframes shine {
-            0% { background-position: -100% 0; }
-            100% { background-position: 200% 0; }
-        }
+        /* Sử dụng font Public Sans cho toàn bộ trang */
         body {
-            background: linear-gradient(135deg, #f6f8fc 0%, #e9f0f7 100%);
-            min-height: 100vh;
+            font-family: "Public Sans", sans-serif;
+            font-style: normal;
         }
-        .date-picker {
-            background-color: #ffffff;
-            border: 2px solid #e2e8f0;
-            transition: all 0.3s ease;
-            -webkit-appearance: none;
-            appearance: none;
-            font-size: 16px;
-            padding: 10px;
-            border-radius: 12px;
-            background-image: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
-            background-size: 200% 100%;
+        /* Thêm hiệu ứng đổ bóng cho văn bản để nổi bật hơn */
+        /*.text-shadow {
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+        }*/
+        /* Tùy chỉnh cho container của đồng hồ */
+        #time {
+            font-family: "Public Sans", sans-serif;
+            /* font-optical-sizing: auto; */
+            font-weight: 900;
+            font-style: normal;
+            font-size: 30vw; 
+            line-height: 1;
+            /* Sử dụng Flexbox để sắp xếp các ký tự */
+            display: flex;
+            justify-content: center;
         }
-        .date-picker:focus {
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
-            outline: none;
-            animation: shine 2s linear infinite;
-        }
-        .info-card {
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            position: relative;
-            overflow: hidden;
-        }
-        .info-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: 0.5s;
-        }
-        .info-card:hover::before {
-            left: 100%;
-        }
-        .info-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1), 0 5px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-        .quick-date-btn {
-            transition: all 0.2s ease;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            position: relative;
-            overflow: hidden;
-        }
-        .quick-date-btn::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255,255,255,0.2);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-        .quick-date-btn:hover::after {
-            width: 300px;
-            height: 300px;
-        }
-        .quick-date-btn:hover {
-            transform: translateY(-2px);
-            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-        }
-        .quick-date-btn:active {
-            transform: translateY(0);
-        }
-        .header-gradient {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-            position: relative;
-            overflow: hidden;
-        }
-        .header-gradient::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
-            transform: translateX(-100%);
-            transition: 0.5s;
-        }
-        .header-gradient:hover::after {
-            transform: translateX(100%);
-        }
-        .info-gradient {
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            transition: all 0.3s ease;
-        }
-        .info-gradient:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        .detail-gradient {
-            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-            transition: all 0.3s ease;
-        }
-        .detail-gradient:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        .icon-animate {
-            animation: float 3s ease-in-out infinite;
-        }
-        .title-animate {
-            animation: pulse 2s ease-in-out infinite;
-        }
-        @media (max-width: 640px) {
-            .container {
-                padding: 0.5rem;
-            }
-            .info-card {
-                padding: 0.75rem;
-            }
-        }
-        .badge {
+
+        /* Kiểu cho từng "hộp" chứa ký tự */
+        #time .char-box {
             display: inline-block;
-            padding: 0.25rem 0.5rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            margin: 0.25rem;
-        }
-        .badge-good {
-            background-color: #dcfce7;
-            color: #166534;
-        }
-        .badge-bad {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-        .share-btn {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-        }
-        .share-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        .tooltip {
-            position: relative;
-            display: inline-block;
-        }
-        .tooltip .tooltip-text {
-            visibility: hidden;
-            background-color: rgba(0, 0, 0, 0.8);
-            color: white;
             text-align: center;
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
+            /* Đặt chiều rộng cố định cho mỗi hộp, đủ rộng cho ký tự lớn nhất */
+            width: 15vw;
         }
-        .tooltip:hover .tooltip-text {
-            visibility: visible;
-            opacity: 1;
+
+        /* Đảm bảo trên màn hình lớn, font không quá to */
+        @media (min-width: 1200px) {
+            #time {
+                font-size: 350px; /* Giới hạn kích thước tối đa */
+            }
+            #time .char-box {
+                /* Đặt chiều rộng cố định tương ứng cho màn hình lớn */
+                width: 220px;
+            }
         }
     </style>
 </head>
-<body class="min-h-screen py-4">
-    <div class="container mx-auto px-3 max-w-2xl">
-        <div class="text-center mb-4">
-            <h1 class="text-2xl font-bold text-gray-800 title-animate">Âm Lịch Việt Nam</h1>
-            <p class="text-sm text-gray-600">Xem ngày âm lịch và thông tin chi tiết</p>
+<body class="bg-gray-900 flex items-center justify-center h-screen overflow-hidden">
+
+    <!-- Container chính cho đồng hồ -->
+    <div class="text-center text-white">
+        
+        <!-- Container của đồng hồ giờ sẽ được JavaScript lấp đầy bằng các ký tự riêng lẻ -->
+        <div id="time" class="tracking-wider text-shadow">
+            <!-- JavaScript sẽ tạo các thẻ span ở đây -->
         </div>
 
-        <div class="grid md:grid-cols-2 gap-4">
-            <!-- Phần chọn ngày -->
-            <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
-                <div class="header-gradient text-white p-4">
-                    <div class="text-center">
-                        <h2 class="text-xl font-semibold" id="currentDate"></h2>
-                        <p class="text-sm opacity-90" id="currentDay"></p>
-                    </div>
-                </div>
-                <div class="p-4">
-                    <div class="grid grid-cols-3 gap-2 mb-4">
-                        <button data-type="today" class="quick-date-btn text-gray-700 py-2 px-3 rounded-lg text-sm font-medium shadow-sm">
-                            Hôm nay
-                        </button>
-                        <button data-type="tomorrow" class="quick-date-btn text-gray-700 py-2 px-3 rounded-lg text-sm font-medium shadow-sm">
-                            Ngày mai
-                        </button>
-                        <button data-type="yesterday" class="quick-date-btn text-gray-700 py-2 px-3 rounded-lg text-sm font-medium shadow-sm">
-                            Hôm qua
-                        </button>
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Hoặc chọn ngày khác:</label>
-                        <input type="date" id="datePicker" class="date-picker w-full">
-                    </div>
-                    <button id="shareBtn" class="share-btn w-full flex items-center justify-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                        </svg>
-                        Chia sẻ
-                    </button>
-                </div>
-            </div>
-
-            <!-- Thông tin âm lịch -->
-            <div class="space-y-4">
-                <div class="info-card bg-white rounded-xl shadow-lg p-4">
-                    <h2 class="text-base font-semibold text-gray-800 mb-3 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-indigo-500 icon-animate" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        Thông tin âm lịch
-                    </h2>
-                    <div class="grid grid-cols-1 gap-2">
-                        <div class="info-gradient p-3 rounded-lg">
-                            <p class="text-sm text-gray-600">Ngày âm lịch:</p>
-                            <p class="text-base font-semibold text-gray-800" id="lunarDay"></p>
-                        </div>
-                        <div class="info-gradient p-3 rounded-lg">
-                            <p class="text-sm text-gray-600">Tháng âm lịch:</p>
-                            <p class="text-base font-semibold text-gray-800" id="lunarMonth"></p>
-                        </div>
-                        <div class="info-gradient p-3 rounded-lg">
-                            <p class="text-sm text-gray-600">Năm âm lịch:</p>
-                            <p class="text-base font-semibold text-gray-800" id="lunarYear"></p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="info-card bg-white rounded-xl shadow-lg p-4">
-                    <h2 class="text-base font-semibold text-gray-800 mb-3 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-emerald-500 icon-animate" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Thông tin chi tiết
-                    </h2>
-                    <div class="grid grid-cols-1 gap-2">
-                        <div class="detail-gradient p-3 rounded-lg">
-                            <p class="text-sm text-gray-600">Can Chi:</p>
-                            <p class="text-base font-semibold text-gray-800" id="canChi"></p>
-                        </div>
-                        <div class="detail-gradient p-3 rounded-lg">
-                            <p class="text-sm text-gray-600">Tiết khí:</p>
-                            <p class="text-base font-semibold text-gray-800" id="tiet"></p>
-                        </div>
-                        <div class="detail-gradient p-3 rounded-lg">
-                            <p class="text-sm text-gray-600">Hoàng Đạo:</p>
-                            <p class="text-base font-semibold text-gray-800" id="hoangDao"></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <!-- Hiển thị ngày tháng -->
+        <div id="date" class="text-3xl md:text-4xl mt-6 opacity-75 tracking-wide" style="font-size: 5vw;">
+            <!-- Ngày tháng sẽ được chèn vào đây bởi JavaScript -->
         </div>
+
     </div>
 
     <script>
-                // Khởi tạo Telegram WebApp
-                const tg = window.Telegram.WebApp;
-                tg.expand();
+        // Lấy các phần tử HTML để hiển thị
+        const timeElement = document.getElementById('time');
+        const dateElement = document.getElementById('date');
 
-                // Các mảng dữ liệu cơ bản
-                const CAN = ['Giáp', 'Ất', 'Bính', 'Đinh', 'Mậu', 'Kỷ', 'Canh', 'Tân', 'Nhâm', 'Quý'];
-                const CHI = ['Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tỵ', 'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi'];
-                const DAYS = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-                const TIET = ['Xuân phân', 'Thanh minh', 'Cốc vũ', 'Lập hạ', 'Tiểu mãn', 'Mang chủng', 'Hạ chí', 'Tiểu thử', 'Đại thử', 'Lập thu', 'Xử thử', 'Bạch lộ', 'Thu phân', 'Hàn lộ', 'Sương giáng', 'Lập đông', 'Tiểu tuyết', 'Đại tuyết', 'Đông chí', 'Tiểu hàn', 'Đại hàn', 'Lập xuân', 'Vũ thủy', 'Kinh trập'];
-                const HOANG_DAO = ['Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tỵ', 'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi'];
+        /**
+         * Hàm cập nhật đồng hồ mỗi giây.
+         */
+        function updateClock() {
+            // Lấy thời gian hiện tại
+            const now = new Date();
 
-                // Hàm định dạng ngày
-                function formatDate(date) {
-                    const day = date.getDate();
-                    const month = date.getMonth() + 1;
-                    const year = date.getFullYear();
-                    return `${day} tháng ${month}, ${year}`;
+            // Định dạng giờ, phút, giây để luôn có hai chữ số
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            const timeString = `${hours}:${minutes}:${seconds}`;
+
+            // --- LOGIC TẠO SPAN CHO TỪNG KÝ TỰ ---
+            
+            // Xóa các ký tự cũ trước khi cập nhật
+            timeElement.innerHTML = '';
+
+            // Lặp qua từng ký tự trong chuỗi thời gian (vd: '1', '2', ':', ...)
+            for (const char of timeString) {
+                // Tạo một thẻ span mới cho mỗi ký tự
+                const charSpan = document.createElement('span');
+                // Thêm class để áp dụng style chiều rộng cố định
+                charSpan.className = 'char-box';
+
+                // **THAY ĐỔI: Nếu ký tự là dấu hai chấm, giảm độ mờ**
+                if (char === ':') {
+                    // Bạn có thể thay đổi giá trị này, ví dụ '0.6' hoặc '0.4'
+                    charSpan.style.opacity = '0.5'; 
+                }
+                
+                // Đặt nội dung của span là ký tự đó
+                charSpan.textContent = char;
+                // Thêm span vào trong div#time
+                timeElement.appendChild(charSpan);
             }
 
-                // Hàm cập nhật hiển thị ngày hiện tại
-                function updateCurrentDateDisplay(date) {
-                    document.getElementById('currentDate').textContent = formatDate(date);
-                    document.getElementById('currentDay').textContent = DAYS[date.getDay()];
-                }
+            // --- Logic cập nhật ngày tháng vẫn như cũ ---
+            const dateOptions = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            const formattedDate = now.toLocaleDateString('vi-VN', dateOptions);
+            dateElement.textContent = formattedDate;
+        }
 
-                // Hàm cập nhật thông tin âm lịch
-                function updateLunarInfo(date) {
-                    try {
-                        const lunar = Lunar.fromDate(date);
+        // Gọi hàm updateClock mỗi 1000ms (1 giây)
+        setInterval(updateClock, 1000);
 
-                    // Cập nhật hiển thị ngày hiện tại
-                    updateCurrentDateDisplay(date);
-                
-                    // Cập nhật thông tin cơ bản
-                    document.getElementById('lunarDay').textContent = `${lunar.getDay()} tháng ${lunar.getMonth()} năm ${lunar.getYear()}`;
-                    document.getElementById('lunarMonth').textContent = `Tháng ${lunar.getMonth()}`;
-                    document.getElementById('lunarYear').textContent = `${CAN[lunar.getYearGanIndex()]} ${CHI[lunar.getYearZhiIndex()]}`;
+        // Gọi hàm lần đầu tiên ngay khi tải trang để không bị trễ 1 giây
+        updateClock();
+    </script>
 
-                    // Cập nhật thông tin chi tiết
-                    const canIndex = lunar.getYearGanIndex();
-                    const chiIndex = lunar.getYearZhiIndex();
-                    document.getElementById('canChi').textContent = `${CAN[canIndex]} ${CHI[chiIndex]}`;
-                
-                    const tietIndex = Math.floor((lunar.getDay() - 1) / 15);
-                    document.getElementById('tiet').textContent = TIET[tietIndex];
-                
-                    const hoangDaoIndex = lunar.getDayZhiIndex();
-                    document.getElementById('hoangDao').textContent = HOANG_DAO[hoangDaoIndex];
-            } catch (error) {
-                    console.error('Error updating lunar info:', error);
-                }
-            }
-
-                // Hàm xử lý chọn ngày nhanh
-                function setDate(type) {
-                    const today = new Date();
-                    let selectedDate = new Date();
-
-                switch (type) {
-                    case 'yesterday':
-                        selectedDate.setDate(today.getDate() - 1);
-                        break;
-                    case 'tomorrow':
-                        selectedDate.setDate(today.getDate() + 1);
-                        break;
-                    default:
-                        selectedDate = today;
-                }
-
-                datePicker.value = selectedDate.toISOString().split('T')[0];
-                updateLunarInfo(selectedDate);
-            }
-
-                // Khởi tạo date picker với ngày hiện tại
-                const datePicker = document.getElementById('datePicker');
-                const today = new Date();
-                datePicker.value = today.toISOString().split('T')[0];
-                updateLunarInfo(today);
-
-                // Xử lý sự kiện khi người dùng chọn ngày
-                datePicker.addEventListener('change', (e) => {
-                    const selectedDate = new Date(e.target.value);
-                    updateLunarInfo(selectedDate);
-            });
-
-                // Thêm sự kiện click cho các nút chọn nhanh
-                document.querySelectorAll('.quick-date-btn').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const type = e.target.getAttribute('data-type');
-                        setDate(type);
-                });
-            });
-
-                // Thêm sự kiện chia sẻ
-                document.getElementById('shareBtn').addEventListener('click', async () => {
-                    const currentDate = document.getElementById('currentDate').textContent;
-                    const lunarDay = document.getElementById('lunarDay').textContent;
-                    const lunarMonth = document.getElementById('lunarMonth').textContent;
-                    const lunarYear = document.getElementById('lunarYear').textContent;
-
-                const shareText = `Ngày ${currentDate}\nÂm lịch: ${lunarDay}\nTháng: ${lunarMonth}\nNăm: ${lunarYear}`;
-
-                if (navigator.share) {
-                    try {
-                        await navigator.share({
-                            title: 'Âm Lịch Việt Nam',
-                            text: shareText,
-                            url: window.location.href
-                        });
-                    } catch (error) {
-                        console.error('Error sharing:', error);
-                        // Fallback: Copy to clipboard
-                        navigator.clipboard.writeText(shareText).then(() => {
-                            alert('Đã sao chép thông tin vào bộ nhớ tạm!');
-                        });
-                    }
-                } else {
-                    // Fallback: Copy to clipboard
-                    navigator.clipboard.writeText(shareText).then(() => {
-                        alert('Đã sao chép thông tin vào bộ nhớ tạm!');
-                    });
-                }
-            });
-                </script>
 </body>
 </html>
