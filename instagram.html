@@ -146,11 +146,9 @@
 
     <script>
         const CONFIG = {
-            AIRTABLE_API_KEY: "patNTQ16tN1lO8XPS.875e8fa46f7d36ca5963ee069e77c7ed341abd1bbbe4da4e60528a20ec6c3491",
-            BASE_ID: "app6Th0E9WNStZhGl",
-            TABLE_NAME: "INSTAGRAM PROFILES",
+            GOOGLE_SHEET_CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPW38KeJu56F5Kz1C9cjOyhcZfUdg-yK5ZmF9-oVWKKEuExQWX0V67-tPn6ID66leGGO7Qv_SmLRn5/pub?gid=0&single=true&output=csv",
             CACHE_KEY: "instagramProfilesCache",
-            CACHE_DURATION_MINUTES: 60 
+            CACHE_DURATION_MINUTES: 60
         };
 
         const DOM = {
@@ -319,7 +317,7 @@
             }
 
             try {
-                const response = await fetchFromAirtable();
+                const response = await fetchFromGoogleSheet();
                 allProfilesData = response.filter(r => r.fields.full_name && r.fields.URL);
                 setCache(allProfilesData);
                 applyFiltersAndSort();
@@ -451,20 +449,35 @@
         }
 
         // --- API & CACHE ---
-        async function fetchFromAirtable() {
-            let allRecords = [];
-            let offset = null;
-            const url = (off) => `https://api.airtable.com/v0/${CONFIG.BASE_ID}/${encodeURIComponent(CONFIG.TABLE_NAME)}?pageSize=100${off ? `&offset=${off}` : ''}`;
+        async function fetchFromGoogleSheet() {
+            const response = await fetch(CONFIG.GOOGLE_SHEET_CSV_URL);
+            if (!response.ok) {
+                throw new Error(`Network response was not ok: ${response.statusText}`);
+            }
+            const csvText = await response.text();
             
-            do {
-                const response = await fetch(url(offset), { headers: { Authorization: `Bearer ${CONFIG.AIRTABLE_API_KEY}` } });
-                if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`);
-                const data = await response.json();
-                allRecords.push(...data.records);
-                offset = data.offset;
-            } while (offset);
+            // Xử lý dữ liệu từ CSV thành định dạng object giống Airtable
+            const lines = csvText.trim().split('\n');
+            const headers = lines[0].split(',').map(h => h.trim());
             
-            return allRecords;
+            const records = lines.slice(1).map(line => {
+                const values = line.split(',').map(v => v.trim());
+                const fields = headers.reduce((obj, header, index) => {
+                    let value = values[index];
+                    // Chuyển đổi cột Rating thành số nếu có
+                    if (header === 'Rating' && !isNaN(parseFloat(value))) {
+                        obj[header] = parseFloat(value);
+                    } else {
+                        obj[header] = value;
+                    }
+                    return obj;
+                }, {});
+
+                // Trả về cấu trúc { fields: {...} } để tương thích với code cũ
+                return { fields: fields };
+            });
+
+            return records;
         }
 
         function getCache() {
