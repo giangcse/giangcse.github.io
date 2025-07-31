@@ -1,239 +1,470 @@
 <!DOCTYPE html>
-<!-- Thêm class="dark" ở đây để bật dark mode mặc định nếu muốn -->
-<html lang="vi">
+<html lang="vi" class="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tài liệu nghiên cứu khoa học</title>
+    <title>Tài liệu nghiên cứu khoa học - Bản hoàn thiện</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome for star icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" />
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script>
         // CẤU HÌNH DARK MODE CHO TAILWIND
         tailwind.config = {
-          darkMode: 'class', // Bật chế độ dark mode dựa trên class
+          darkMode: 'class',
           theme: {
             extend: {
-              // Bạn có thể thêm các màu sắc tùy chỉnh ở đây nếu cần
+              keyframes: {
+                shimmer: {
+                  '100%': { transform: 'translateX(100%)' },
+                }
+              },
+              animation: {
+                shimmer: 'shimmer 1.5s infinite'
+              },
+              colors: {
+                'primary': { '50': '#fef1f5', '100': '#fee4ec', '200': '#fecddf', '300': '#fda9c8', '400': '#fa77a8', '500': '#f34d8a', '600': '#e12b6b', '700': '#be1f56', '800': '#9c1c48', '900': '#821c40', '950': '#4f0a22' },
+              }
             }
           }
         }
     </script>
     <style>
-        /* Custom font */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        
-        html {
-            scroll-behavior: smooth;
+        @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap');
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Be Vietnam Pro', sans-serif; }
+        .profile-card { transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.4s ease; }
+        .profile-card:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); }
+        #scrollToTopBtn { transition: opacity 0.3s, transform 0.3s; }
+        #scrollToTopBtn.hidden { opacity: 0; transform: translateY(20px); }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background-color: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-track { background-color: #1e293b; }
+        .dark ::-webkit-scrollbar-thumb { background-color: #475569; }
+        .hiding { display: none; }
+        .lazy-img { opacity: 0; transition: opacity 0.4s ease-in-out; }
+        .lazy-img.loaded { opacity: 1; }
+        /* CSS cho Skeleton Placeholder */
+        .skeleton-card .placeholder {
+            position: relative;
+            overflow: hidden;
+            background-color: #e2e8f0;
         }
-
-        body {
-            font-family: 'Inter', sans-serif;
+        .dark .skeleton-card .placeholder {
+            background-color: #334155;
         }
-        
-        /* FIX: Xóa @apply khỏi CSS, di chuyển class vào HTML/JS */
-        .profile-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        .skeleton-card .placeholder::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            transform: translateX(-100%);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shimmer 1.5s infinite;
         }
-        .profile-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-        }
-
-        #scrollToTopBtn {
-            transition: opacity 0.3s, transform 0.3s;
+        .dark .skeleton-card .placeholder::after {
+             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
         }
     </style>
 </head>
-<!-- FIX: Thêm các class cho body trực tiếp vào đây -->
-<body class="bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300">
 
-    <!-- Header -->
-    <header class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-10 transition-colors duration-300">
-        <div class="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
-                <i class="fab fa-instagram text-pink-500 mr-3"></i>
-                Tài liệu nghiên cứu khoa học
-            </h1>
-            <!-- NÚT CHUYỂN DARK/LIGHT MODE -->
-            <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
-                <i id="theme-toggle-dark-icon" class="hidden fas fa-moon"></i>
-                <i id="theme-toggle-light-icon" class="hidden fas fa-sun"></i>
-            </button>
+    <div class="fixed top-0 left-0 w-full h-1 z-50">
+        <div id="scroll-progress-bar" class="h-full bg-gradient-to-r from-primary-500 to-orange-400 transition-all duration-75 ease-out" style="width: 0%;"></div>
+    </div>
+
+    <header class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm sticky top-0 z-20 transition-colors duration-300 mt-1">
+        <div class="container mx-auto px-4 sm:px-6 py-4">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                 <div class="flex items-center gap-3">
+                    <i class="fab fa-instagram text-primary-500 text-3xl"></i>
+                    <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Hồ sơ Instagram</h1>
+                 </div>
+                <div class="w-full sm:w-auto flex items-center gap-2">
+                    <div class="relative flex-grow">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i class="fas fa-search text-gray-400"></i></div>
+                        <input type="text" id="search-input" placeholder="Tìm theo tên..." class="block w-full pl-10 pr-10 py-2.5 border border-gray-300 dark:border-gray-600 rounded-full leading-5 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition">
+                        <button id="clear-search-btn" class="absolute inset-y-0 right-0 pr-3 flex items-center hidden"><i class="fas fa-times-circle text-gray-400 hover:text-primary-500"></i></button>
+                    </div>
+                    <button id="theme-toggle" type="button" class="flex-shrink-0 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-full text-sm p-2.5 w-10 h-10 flex items-center justify-center">
+                        <i id="theme-toggle-dark-icon" class="hidden fas fa-moon"></i>
+                        <i id="theme-toggle-light-icon" class="hidden fas fa-sun"></i>
+                    </button>
+                </div>
+            </div>
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="container mx-auto px-4 sm:px-6 py-8">
-        <!-- Loading Spinner -->
-        <div id="loading" class="flex justify-center items-center py-16">
-            <div class="w-16 h-16 border-4 border-dashed border-gray-400 dark:border-gray-600 rounded-full animate-spin"></div>
+        <!-- NEW: Filter and Sort Controls -->
+        <div id="controls" class="mb-8 p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+            <div class="flex flex-col md:flex-row gap-6">
+                <!-- Filter by Rating -->
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Lọc theo xếp hạng</label>
+                    <div id="rating-filter" class="flex flex-wrap gap-2">
+                        <button data-rating="0" class="filter-btn active"><i class="fas fa-star mr-1"></i> Tất cả</button>
+                        <button data-rating="5" class="filter-btn"><i class="fas fa-star mr-1"></i> 5</button>
+                        <button data-rating="4" class="filter-btn"><i class="fas fa-star mr-1"></i> 4+</button>
+                        <button data-rating="3" class="filter-btn"><i class="fas fa-star mr-1"></i> 3+</button>
+                    </div>
+                </div>
+                <!-- Sort by -->
+                <div class="flex-1">
+                    <label for="sort-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Sắp xếp theo</label>
+                    <select id="sort-select" class="w-full bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+                        <option value="name_asc">Tên (A-Z)</option>
+                        <option value="name_desc">Tên (Z-A)</option>
+                        <option value="rating_desc">Xếp hạng (Cao-Thấp)</option>
+                        <option value="rating_asc">Xếp hạng (Thấp-Cao)</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
-        <!-- Profiles Grid -->
-        <div id="profiles-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
-            <!-- Dữ liệu profile sẽ được chèn vào đây bằng JavaScript -->
-        </div>
+        <!-- NEW: Skeleton Grid -->
+        <div id="skeleton-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 sm:gap-6"></div>
 
-        <!-- Error Message -->
-        <div id="error-message" class="hidden text-center mt-8 bg-red-100 text-red-700 p-4 rounded-lg">
-            <p class="font-bold">Đã xảy ra lỗi!</p>
-            <p>Không thể tải dữ liệu từ Airtable. Vui lòng kiểm tra lại cấu hình và API key.</p>
+        <div id="profiles-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 sm:gap-6"></div>
+        
+        <div id="no-results-message" class="hidden text-center py-16">
+            <i class="fas fa-ghost text-5xl text-gray-300 dark:text-gray-600 mb-4"></i>
+            <p class="text-xl font-semibold text-gray-700 dark:text-gray-300">Không tìm thấy kết quả</p>
+            <p class="text-gray-500 dark:text-gray-400 mt-1">Hãy thử thay đổi bộ lọc hoặc từ khóa tìm kiếm.</p>
+        </div>
+        <div id="error-message" class="hidden text-center py-16">
+             <i class="fas fa-exclamation-triangle text-5xl text-red-400 mb-4"></i>
+            <p class="text-xl font-semibold text-red-600 dark:text-red-400">Đã xảy ra lỗi!</p>
+            <p class="text-gray-500 dark:text-gray-400 mt-1">Không thể tải dữ liệu. Vui lòng thử lại sau.</p>
         </div>
     </main>
 
-    <!-- NÚT SCROLL TO TOP -->
-    <button id="scrollToTopBtn" class="hidden fixed bottom-5 right-5 bg-pink-500 text-white w-12 h-12 rounded-full shadow-lg hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-400">
-        <i class="fas fa-arrow-up"></i>
-    </button>
+    <button id="scrollToTopBtn" class="hidden fixed bottom-6 right-6 bg-primary-500 text-white w-12 h-12 rounded-full shadow-lg hover:bg-primary-600 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:focus:ring-primary-800"><i class="fas fa-arrow-up"></i></button>
 
     <script>
-        // --- CẤU HÌNH AIRTABLE ---
-        const AIRTABLE_API_KEY = "patNTQ16tN1lO8XPS.875e8fa46f7d36ca5963ee069e77c7ed341abd1bbbe4da4e60528a20ec6c3491";
-        const BASE_ID = "app6Th0E9WNStZhGl";
-        const TABLE_NAME = "INSTAGRAM PROFILES";
-
-        // --- LOGIC GIAO DIỆN ---
-        const scrollToTopBtn = document.getElementById('scrollToTopBtn');
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const darkIcon = document.getElementById('theme-toggle-dark-icon');
-        const lightIcon = document.getElementById('theme-toggle-light-icon');
-
-        // Hàm hiển thị sao
-        function renderStars(rating) {
-            if (typeof rating !== 'number' || rating < 0) {
-                return '<span class="text-gray-400 dark:text-gray-500">Chưa có xếp hạng</span>';
-            }
-            let starsHtml = '';
-            for (let i = 1; i <= 5; i++) {
-                starsHtml += i <= rating ? '<i class="fas fa-star text-yellow-400"></i>' : '<i class="far fa-star text-gray-300 dark:text-gray-600"></i>';
-            }
-            return starsHtml;
-        }
-
-        // 1. LOGIC DARK/LIGHT MODE
-        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-            lightIcon.classList.remove('hidden');
-        } else {
-            document.documentElement.classList.remove('dark');
-            darkIcon.classList.remove('hidden');
-        }
-
-        themeToggleBtn.addEventListener('click', function() {
-            darkIcon.classList.toggle('hidden');
-            lightIcon.classList.toggle('hidden');
-            if (localStorage.getItem('color-theme')) {
-                if (localStorage.getItem('color-theme') === 'light') {
-                    document.documentElement.classList.add('dark');
-                    localStorage.setItem('color-theme', 'dark');
-                } else {
-                    document.documentElement.classList.remove('dark');
-                    localStorage.setItem('color-theme', 'light');
-                }
-            } else {
-                if (document.documentElement.classList.contains('dark')) {
-                    document.documentElement.classList.remove('dark');
-                    localStorage.setItem('color-theme', 'light');
-                } else {
-                    document.documentElement.classList.add('dark');
-                    localStorage.setItem('color-theme', 'dark');
-                }
-            }
-        });
-
-        // 2. LOGIC SCROLL TO TOP
-        window.onscroll = function() {
-            if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
-                scrollToTopBtn.classList.remove('hidden');
-            } else {
-                scrollToTopBtn.classList.add('hidden');
-            }
+        const CONFIG = {
+            AIRTABLE_API_KEY: "patNTQ16tN1lO8XPS.875e8fa46f7d36ca5963ee069e77c7ed341abd1bbbe4da4e60528a20ec6c3491",
+            BASE_ID: "app6Th0E9WNStZhGl",
+            TABLE_NAME: "INSTAGRAM PROFILES",
+            CACHE_KEY: "instagramProfilesCache",
+            CACHE_DURATION_MINUTES: 60 
         };
-        scrollToTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-        // 3. LOGIC LẤY DỮ LIỆU TỪ AIRTABLE
-        async function fetchAndRenderProfiles() {
-            const profilesGrid = document.getElementById('profiles-grid');
-            const loadingSpinner = document.getElementById('loading');
-            const errorMessage = document.getElementById('error-message');
+        const DOM = {
+            themeToggle: document.getElementById('theme-toggle'),
+            darkIcon: document.getElementById('theme-toggle-dark-icon'),
+            lightIcon: document.getElementById('theme-toggle-light-icon'),
+            scrollToTopBtn: document.getElementById('scrollToTopBtn'),
+            searchInput: document.getElementById('search-input'),
+            clearSearchBtn: document.getElementById('clear-search-btn'),
+            profilesGrid: document.getElementById('profiles-grid'),
+            skeletonGrid: document.getElementById('skeleton-grid'),
+            errorMessage: document.getElementById('error-message'),
+            noResultsMessage: document.getElementById('no-results-message'),
+            scrollProgressBar: document.getElementById('scroll-progress-bar'),
+            ratingFilter: document.getElementById('rating-filter'),
+            sortSelect: document.getElementById('sort-select'),
+            controls: document.getElementById('controls'),
+        };
 
-            const encodedTableName = encodeURIComponent(TABLE_NAME);
-            let allRecords = [];
-            let offset = null;
+        let allProfilesData = [];
+        let lazyImageObserver;
+        
+        const state = {
+            searchTerm: '',
+            sortBy: 'name_asc',
+            filterRating: 0
+        };
+
+        // --- CORE FUNCTIONS ---
+        function renderStars(rating) {
+            if (typeof rating !== 'number' || rating < 0) return '<span class="text-xs text-gray-400 dark:text-gray-500">Chưa xếp hạng</span>';
+            let html = '';
+            const full = Math.floor(rating), half = rating % 1 !== 0, empty = 5 - full - (half ? 1 : 0);
+            for (let i = 0; i < full; i++) html += '<i class="fas fa-star text-yellow-400"></i>';
+            if (half) html += '<i class="fas fa-star-half-alt text-yellow-400"></i>';
+            for (let i = 0; i < empty; i++) html += '<i class="far fa-star text-gray-300 dark:text-gray-500"></i>';
+            return html;
+        }
+
+        function createProfileCard(fields) {
+            const card = document.createElement('a');
+            card.href = fields.URL;
+            card.target = '_blank';
+            card.rel = 'noopener noreferrer';
+            card.className = 'profile-card bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden block';
+            card.dataset.name = fields.full_name;
+
+            const imageContainer = document.createElement('div');
+            imageContainer.className = 'aspect-square bg-gray-200 dark:bg-gray-700';
+            const img = document.createElement('img');
+            img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+            img.dataset.src = fields.profile_pic_url || '';
+            img.alt = `Ảnh đại diện của ${fields.full_name}`;
+            img.className = 'lazy-img w-full h-full object-cover';
+            img.onerror = function() {
+                const fallback = document.createElement('div');
+                fallback.className = 'w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-5xl font-bold';
+                fallback.textContent = fields.full_name.charAt(0).toUpperCase();
+                this.replaceWith(fallback);
+            };
+            imageContainer.appendChild(img);
+            lazyImageObserver.observe(img);
+
+            const infoContainer = document.createElement('div');
+            infoContainer.className = 'p-4';
+            infoContainer.innerHTML = `
+                <h3 class="font-bold text-base text-gray-800 dark:text-gray-100 truncate" title="${fields.full_name}">${fields.full_name}</h3>
+                <div class="mt-2 flex items-center gap-2 text-sm">
+                    ${renderStars(fields.Rating)}
+                    <span class="text-xs text-gray-500">(${fields.Rating || 'N/A'})</span>
+                </div>`;
+            card.appendChild(imageContainer);
+            card.appendChild(infoContainer);
+            return card;
+        }
+
+        function createSkeletonCard() {
+            const card = document.createElement('div');
+            card.className = 'skeleton-card bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden';
+            card.innerHTML = `
+                <div class="placeholder aspect-square"></div>
+                <div class="p-4">
+                    <div class="placeholder h-5 w-3/4 rounded"></div>
+                    <div class="placeholder h-4 w-1/2 mt-3 rounded"></div>
+                </div>`;
+            return card;
+        }
+
+        function applyFiltersAndSort() {
+            let filteredData = [...allProfilesData];
+            
+            // Search filter
+            if (state.searchTerm) {
+                filteredData = filteredData.filter(p => p.fields.full_name.toLowerCase().includes(state.searchTerm));
+            }
+            // Rating filter
+            if (state.filterRating > 0) {
+                filteredData = filteredData.filter(p => p.fields.Rating >= state.filterRating);
+            }
+
+            // Sorting
+            filteredData.sort((a, b) => {
+                const aFields = a.fields;
+                const bFields = b.fields;
+                switch (state.sortBy) {
+                    case 'name_asc': return aFields.full_name.localeCompare(bFields.full_name);
+                    case 'name_desc': return bFields.full_name.localeCompare(aFields.full_name);
+                    case 'rating_desc': return (bFields.Rating || 0) - (aFields.Rating || 0);
+                    case 'rating_asc': return (aFields.Rating || 0) - (bFields.Rating || 0);
+                    default: return 0;
+                }
+            });
+            
+            displayProfiles(filteredData);
+        }
+
+        function displayProfiles(profiles) {
+            DOM.profilesGrid.innerHTML = '';
+            if (profiles.length === 0) {
+                DOM.noResultsMessage.classList.remove('hidden');
+            } else {
+                DOM.noResultsMessage.classList.add('hidden');
+                const fragment = document.createDocumentFragment();
+                profiles.forEach(p => fragment.appendChild(createProfileCard(p.fields)));
+                DOM.profilesGrid.appendChild(fragment);
+            }
+        }
+
+        async function loadProfiles() {
+            DOM.skeletonGrid.classList.remove('hidden');
+            DOM.controls.classList.add('hidden');
+            for (let i = 0; i < 10; i++) {
+                DOM.skeletonGrid.appendChild(createSkeletonCard());
+            }
+
+            const cache = getCache();
+            if (cache) {
+                allProfilesData = cache;
+                applyFiltersAndSort();
+                DOM.skeletonGrid.classList.add('hidden');
+                DOM.controls.classList.remove('hidden');
+            }
 
             try {
-                do {
-                    const urlWithOffset = `https://api.airtable.com/v0/${BASE_ID}/${encodedTableName}?pageSize=100${offset ? `&offset=${offset}` : ''}`;
-                    const response = await fetch(urlWithOffset, {
-                        headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}` }
-                    });
-
-                    if (!response.ok) throw new Error(`Lỗi mạng: ${response.statusText}`);
-
-                    const data = await response.json();
-                    allRecords = [...allRecords, ...data.records];
-                    offset = data.offset; // Nếu còn data, Airtable sẽ trả về offset
-
-                } while (offset); // Tiếp tục loop nếu còn offset
-
-                loadingSpinner.style.display = 'none';
-
-                if (!allRecords || allRecords.length === 0) {
-                    profilesGrid.innerHTML = '<p class="text-center col-span-full text-gray-500 dark:text-gray-400">Không tìm thấy hồ sơ nào.</p>';
-                    return;
-                }
-
-                // Render từng record
-                allRecords.forEach(record => {
-                    const fields = record.fields;
-                    if (!fields.full_name || !fields.URL) return;
-
-                    const profileCard = document.createElement('a');
-                    profileCard.href = fields.URL;
-                    profileCard.target = '_blank';
-                    // FIX: Thêm class cho profile card trực tiếp vào đây
-                    profileCard.className = 'profile-card bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden block';
-
-                    const imageContainer = document.createElement('div');
-                    imageContainer.className = 'h-40 sm:h-48 bg-gray-200 dark:bg-gray-700';
-
-                    const img = document.createElement('img');
-                    img.src = fields.profile_pic_url || '';
-                    img.alt = `Ảnh đại diện của ${fields.full_name}`;
-                    img.className = 'w-full h-full object-cover';
-                    img.onerror = function() {
-                        const fallbackInitial = fields.full_name.charAt(0).toUpperCase();
-                        const fallbackDiv = document.createElement('div');
-                        fallbackDiv.className = 'w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-4xl sm:text-5xl font-bold';
-                        fallbackDiv.textContent = fallbackInitial;
-                        this.replaceWith(fallbackDiv);
-                    };
-                    imageContainer.appendChild(img);
-
-                    const infoContainer = document.createElement('div');
-                    infoContainer.className = 'p-3 sm:p-4';
-                    infoContainer.innerHTML = `
-                        <h3 class="font-semibold text-base text-gray-800 dark:text-gray-100 truncate">${fields.full_name}</h3>
-                        <div class="mt-2 text-xs sm:text-sm flex items-center space-x-1">
-                            ${renderStars(fields.Rating)}
-                        </div>
-                    `;
-
-                    profileCard.appendChild(imageContainer);
-                    profileCard.appendChild(infoContainer);
-                    profilesGrid.appendChild(profileCard);
-                });
-
+                const response = await fetchFromAirtable();
+                allProfilesData = response.filter(r => r.fields.full_name && r.fields.URL);
+                setCache(allProfilesData);
+                applyFiltersAndSort();
             } catch (error) {
-                console.error('Lỗi khi lấy dữ liệu từ Airtable:', error);
-                loadingSpinner.style.display = 'none';
-                errorMessage.classList.remove('hidden');
+                console.error("Failed to fetch from Airtable:", error);
+                if (!cache) DOM.errorMessage.classList.remove('hidden');
+            } finally {
+                if (!DOM.skeletonGrid.classList.contains('hidden')) {
+                    DOM.skeletonGrid.classList.add('hidden');
+                    DOM.controls.classList.remove('hidden');
+                }
             }
         }
+        
+        // --- EVENT HANDLERS & SETUP ---
+        function setupEventListeners() {
+            DOM.themeToggle.addEventListener('click', () => {
+                const isDark = document.documentElement.classList.toggle('dark');
+                localStorage.setItem('color-theme', isDark ? 'dark' : 'light');
+                DOM.darkIcon.classList.toggle('hidden');
+                DOM.lightIcon.classList.toggle('hidden');
+            });
 
-        document.addEventListener('DOMContentLoaded', fetchAndRenderProfiles);
+            window.addEventListener('scroll', () => {
+                const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+                const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                DOM.scrollProgressBar.style.width = `${scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0}%`;
+                DOM.scrollToTopBtn.classList.toggle('hidden', scrollTop < 200);
+            });
+
+            DOM.scrollToTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+            DOM.searchInput.addEventListener('input', () => {
+                state.searchTerm = DOM.searchInput.value.toLowerCase().trim();
+                DOM.clearSearchBtn.classList.toggle('hidden', state.searchTerm.length === 0);
+                applyFiltersAndSort();
+            });
+
+            DOM.clearSearchBtn.addEventListener('click', () => {
+                DOM.searchInput.value = '';
+                state.searchTerm = '';
+                DOM.clearSearchBtn.classList.add('hidden');
+                applyFiltersAndSort();
+                DOM.searchInput.focus();
+            });
+            
+            DOM.sortSelect.addEventListener('change', (e) => {
+                state.sortBy = e.target.value;
+                applyFiltersAndSort();
+            });
+            
+            DOM.ratingFilter.addEventListener('click', (e) => {
+                const button = e.target.closest('.filter-btn');
+                if (!button) return;
+                
+                state.filterRating = parseInt(button.dataset.rating, 10);
+                
+                // Update button styles
+                DOM.ratingFilter.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                button.classList.add('active');
+                
+                applyFiltersAndSort();
+            });
+        }
+        
+        function setupLazyLoading() {
+            lazyImageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const lazyImage = entry.target;
+                        lazyImage.src = lazyImage.dataset.src;
+                        lazyImage.classList.add('loaded');
+                        observer.unobserve(lazyImage);
+                    }
+                });
+            }, { rootMargin: "0px 0px 200px 0px" });
+        }
+
+        function setupTheme() {
+            if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                DOM.lightIcon.classList.remove('hidden');
+            } else {
+                document.documentElement.classList.remove('dark');
+                DOM.darkIcon.classList.remove('hidden');
+            }
+            // UPDATE: Add styles for filter buttons using plain CSS for reliability
+            const style = document.createElement('style');
+            style.textContent = `
+                .filter-btn {
+                    padding: 0.5rem 1rem;
+                    font-size: 0.875rem;
+                    line-height: 1.25rem;
+                    font-weight: 500;
+                    border-radius: 9999px;
+                    border-width: 1px;
+                    border-color: #d1d5db; /* gray-300 */
+                    background-color: #ffffff; /* white */
+                    color: #374151; /* gray-700 */
+                    cursor: pointer;
+                    transition: all 0.2s ease-in-out;
+                }
+                .dark .filter-btn {
+                    border-color: #4b5563; /* dark:gray-600 */
+                    background-color: #1f2937; /* dark:gray-800 */
+                    color: #d1d5db; /* dark:gray-300 */
+                }
+                .filter-btn:hover {
+                    background-color: #f3f4f6; /* gray-100 */
+                }
+                .dark .filter-btn:hover {
+                    background-color: #374151; /* dark:gray-700 */
+                }
+                .filter-btn.active {
+                    background-color: #f34d8a; /* primary-500 */
+                    border-color: #f34d8a; /* primary-500 */
+                    color: #ffffff; /* white */
+                }
+                .filter-btn.active:hover {
+                    background-color: #e12b6b; /* primary-600 */
+                }
+            `;
+            document.head.append(style);
+        }
+
+        // --- API & CACHE ---
+        async function fetchFromAirtable() {
+            let allRecords = [];
+            let offset = null;
+            const url = (off) => `https://api.airtable.com/v0/${CONFIG.BASE_ID}/${encodeURIComponent(CONFIG.TABLE_NAME)}?pageSize=100${off ? `&offset=${off}` : ''}`;
+            
+            do {
+                const response = await fetch(url(offset), { headers: { Authorization: `Bearer ${CONFIG.AIRTABLE_API_KEY}` } });
+                if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`);
+                const data = await response.json();
+                allRecords.push(...data.records);
+                offset = data.offset;
+            } while (offset);
+            
+            return allRecords;
+        }
+
+        function getCache() {
+            const cachedData = localStorage.getItem(CONFIG.CACHE_KEY);
+            if (!cachedData) return null;
+            
+            const { timestamp, data } = JSON.parse(cachedData);
+            const isExpired = (new Date().getTime() - timestamp) > (CONFIG.CACHE_DURATION_MINUTES * 60 * 1000);
+            
+            return isExpired ? null : data;
+        }
+
+        function setCache(data) {
+            const cachePayload = {
+                timestamp: new Date().getTime(),
+                data: data
+            };
+            localStorage.setItem(CONFIG.CACHE_KEY, JSON.stringify(cachePayload));
+        }
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            setupTheme();
+            setupLazyLoading();
+            setupEventListeners();
+            loadProfiles();
+        });
     </script>
 </body>
 </html>
