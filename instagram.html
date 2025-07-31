@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tài liệu nghiên cứu khoa học - Bản hoàn thiện</title>
+    <title>Tài liệu nghiên cứu khoa học</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome for icons -->
@@ -81,7 +81,7 @@
             <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
                  <div class="flex items-center gap-3">
                     <i class="fab fa-instagram text-primary-500 text-3xl"></i>
-                    <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Hồ sơ Instagram</h1>
+                    <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Tài liệu NCKH</h1>
                  </div>
                 <div class="w-full sm:w-auto flex items-center gap-2">
                     <div class="relative flex-grow">
@@ -188,6 +188,30 @@
             if (half) html += '<i class="fas fa-star-half-alt text-yellow-400"></i>';
             for (let i = 0; i < empty; i++) html += '<i class="far fa-star text-gray-300 dark:text-gray-500"></i>';
             return html;
+        }
+
+        // NEW: Custom smooth scroll function
+        function smoothScrollToTop(duration) {
+            const startPosition = window.pageYOffset;
+            const distance = -startPosition;
+            let startTime = null;
+
+            function easeInOutQuad(t, b, c, d) {
+                t /= d / 2;
+                if (t < 1) return c / 2 * t * t + b;
+                t--;
+                return -c / 2 * (t * (t - 2) - 1) + b;
+            };
+
+            function animation(currentTime) {
+                if (startTime === null) startTime = currentTime;
+                const timeElapsed = currentTime - startTime;
+                const run = easeInOutQuad(timeElapsed, startPosition, distance, duration);
+                window.scrollTo(0, run);
+                if (timeElapsed < duration) requestAnimationFrame(animation);
+            }
+
+            requestAnimationFrame(animation);
         }
 
         function createProfileCard(fields) {
@@ -326,7 +350,10 @@
                 DOM.scrollToTopBtn.classList.toggle('hidden', scrollTop < 200);
             });
 
-            DOM.scrollToTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+            // UPDATE: Use the custom smooth scroll function
+            DOM.scrollToTopBtn.addEventListener('click', () => {
+                smoothScrollToTop(800); // 800ms duration for a nice, smooth scroll
+            });
 
             DOM.searchInput.addEventListener('input', () => {
                 state.searchTerm = DOM.searchInput.value.toLowerCase().trim();
