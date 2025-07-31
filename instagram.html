@@ -160,23 +160,33 @@
             const errorMessage = document.getElementById('error-message');
 
             const encodedTableName = encodeURIComponent(TABLE_NAME);
-            const url = `https://api.airtable.com/v0/${BASE_ID}/${encodedTableName}`;
+            let allRecords = [];
+            let offset = null;
 
             try {
-                const response = await fetch(url, { headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}` } });
-                if (!response.ok) throw new Error(`Lỗi mạng: ${response.statusText}`);
-                
-                const data = await response.json();
-                const records = data.records;
+                do {
+                    const urlWithOffset = `https://api.airtable.com/v0/${BASE_ID}/${encodedTableName}?pageSize=100${offset ? `&offset=${offset}` : ''}`;
+                    const response = await fetch(urlWithOffset, {
+                        headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}` }
+                    });
+
+                    if (!response.ok) throw new Error(`Lỗi mạng: ${response.statusText}`);
+
+                    const data = await response.json();
+                    allRecords = [...allRecords, ...data.records];
+                    offset = data.offset; // Nếu còn data, Airtable sẽ trả về offset
+
+                } while (offset); // Tiếp tục loop nếu còn offset
 
                 loadingSpinner.style.display = 'none';
 
-                if (!records || records.length === 0) {
+                if (!allRecords || allRecords.length === 0) {
                     profilesGrid.innerHTML = '<p class="text-center col-span-full text-gray-500 dark:text-gray-400">Không tìm thấy hồ sơ nào.</p>';
                     return;
                 }
 
-                records.forEach(record => {
+                // Render từng record
+                allRecords.forEach(record => {
                     const fields = record.fields;
                     if (!fields.full_name || !fields.URL) return;
 
